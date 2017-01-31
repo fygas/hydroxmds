@@ -1,15 +1,17 @@
-from django.db import models
-from .structure_base import NameableArtefact 
-from hvad.models import TranslatableModel, TranslatedFields
 from django.contrib.postgres.fields import ArrayField
-from common.models.constants import max_length
-from .constants import Organisation_types 
+from django.db import models
+from hvad.models import TranslatableModel, TranslatedFields
+
+from ..constants import Organisation_types 
+from common.constants import max_length
+
+from ..models import NameableArtefact 
 
 #Organisation Structure
 class Organisation(NameableArtefact):
-    type_ = models.CharField(max_length=max_length['id'], choices=Organisation_types, null=True, blank=True)
+    type_code = models.CharField(max_length=max_length['id'], null=True, blank=True, choices=Organisation_types) 
     Parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
-    Contacts = models.ManyToManyField('Contact', null=True, blank=True)
+    Contacts = models.ManyToManyField('Contact')
     translations = TranslatedFields()
 
 class Contact(TranslatableModel):

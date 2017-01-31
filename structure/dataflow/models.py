@@ -6,5 +6,5 @@ from common.models import Reference
 
 #Dataflow Structure
 class Dataflow(NameableArtefact):
-    structure = models.ForeignKey(Reference, null=True, blank=True, related_name='+')
+    structure = models.ForeignKey(Reference, null=True, blank=True)
     translations = TranslatedFields()
