@@ -132,3 +132,4 @@ package_types = (
     ("categoryscheme", "categoryscheme"),
     ("conceptscheme", "conceptscheme"),
 )
+

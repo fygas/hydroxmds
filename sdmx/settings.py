@@ -31,29 +31,36 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'common',
-    'structure',
-    'structure.categorisation',
-    'structure.category',
-    'structure.codelist',
-    'structure.concept',
-    'structure.constraint',
-    'structure.data_structure',
-    'structure.dataflow',
-    'structure.hierarchical_codelist',
-    'structure.metadata_structure',
-    'structure.metadataflow',
-    'structure.organisation',
-    'structure.process',
-    'structure.provision',
-    'structure.reporting_taxonomy',
-    'structure.structure_set',
+    # django apps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
-    'django.contrib.sessions',
     'django.contrib.messages',
+    'django.contrib.sessions',
     'django.contrib.staticfiles',
+    # third party apps
+    'crispy_forms',
+    'django_fullclean',
+    'hvad',
+    # my apps
+    'sdmx',
+    'common',
+    'structure',
+    'organisation',
+    # 'structure.categorisation',
+    # 'structure.category',
+    # 'structure.codelist',
+    # 'structure.concept',
+    # 'structure.constraint',
+    # 'structure.data_structure',
+    # 'structure.dataflow',
+    # 'structure.hierarchical_codelist',
+    # 'structure.metadata_structure',
+    # 'structure.metadataflow',
+    # 'structure.process',
+    # 'structure.provision',
+    # 'structure.reporting_taxonomy',
+    # 'structure.structure_set',
 ]
 
 MIDDLEWARE = [
@@ -71,7 +78,7 @@ ROOT_URLCONF = 'sdmx.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -126,7 +133,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Athens'
 
 USE_I18N = True
 
@@ -139,3 +146,17 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
+
+STATIC_ROOT = os.path.join(os.path.dirname(os.path.dirname(BASE_DIR)), 'static_in_env', 'static_root')
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static_in_pro", "our_static"),
+]
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(os.path.dirname(os.path.dirname(BASE_DIR)), 'static_in_env', 'media_root')
+
+MAX_LENGTH = 255
+
+# Crispy forms settings
+CRISPY_TEMPLATE_PACK = 'bootstrap3'
