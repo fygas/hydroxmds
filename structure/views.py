@@ -1,3 +1,10 @@
-from django.shortcuts import render
+from django.views.generic.edit import CreateView 
+# from .models import Organisation
+# from .forms import OrganisationForm 
 
-# Create your views here.
+class ItemSchemeCreateView(CreateView):
+    pass
+#
+# class OrganisationCreateView(CreateView):
+#     form_class = OrganisationForm 
+#     model = Organisation

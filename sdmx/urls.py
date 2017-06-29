@@ -20,10 +20,10 @@ from django.contrib import admin
 from django.views.generic import TemplateView
 
 urlpatterns = [
-    url(r'^test/$', TemplateView.as_view(template_name="navbar-fixed-top.html")),
-    url(r'^$', TemplateView.as_view(template_name="static_top_navbar/base.html"), name='base'),
-    # url(r'data/$', include('data.urls')),
-    url(r'metadata/', include('structure.urls')),
+    url(r'^$', TemplateView.as_view(template_name="sdmx/home.html"), name='home'),
+    url(r'^hybrid/', include('hybrid.urls')),
+    url(r'^metadata/structure/', include('structure.urls')),
+    url(r'^metadata/common/', include('common.urls')),
     url(r'^admin/', admin.site.urls),
 ]
 

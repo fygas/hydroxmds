@@ -1,31 +1,27 @@
 from django.conf import settings
 from django.db import models
-from hvad.models import TranslatableModel, TranslatedFields
 
 from .constants import class_types, package_types
 
 
 # Concrete Annotation
-class Annotation(TranslatableModel):
-    annotationTitle = models.CharField(max_length=settings.MAX_LENGTH, null=True, blank=True)
-    annotationType = models.CharField(max_length=settings.MAX_LENGTH, null=True, blank=True)
-    annotationURL = models.URLField(null=True, blank=True)
-    tranaslations = TranslatedFields(
-        annotationText = models.TextField(null=True, blank=True)
-    )
+class Annotation(models.Model):
+    annotation_title = models.CharField(max_length=settings.MAX_LENGTH, null=True, blank=True)
+    annotation_type = models.CharField(max_length=settings.MAX_LENGTH, null=True, blank=True)
+    annotation_URL = models.URLField(null=True, blank=True)
+    annotation_text = models.TextField(null=True, blank=True)
     id_code = models.CharField('id', max_length=settings.MAX_LENGTH, null=True, blank=True)
 
     def __str__(self):
         display_name = '%(id_code)s: %(title)s' % \
-                {'title': self.annotationTitle, 'id_code': self.id_code}
+                {'title': self.annotation_title, 'id_code': self.id_code}
         return display_name
 
 # Abstract models
-class AnnotableArtefact(TranslatableModel):
+class AnnotableArtefact(models.Model):
+    annotations = models.ManyToManyField(Annotation, related_name='+', blank=True)
     class Meta:
         abstract = True
-    annotations = models.ManyToManyField(Annotation, related_name='+', 
-                                         blank=True)
 
 # Concrete models 
 class RefBase(models.Model):
@@ -48,11 +44,8 @@ class ISOConceptReference(models.Model):
     ConceptSchemeID= models.CharField(max_length=settings.MAX_LENGTH, null=True, blank=True)
     ConceptID= models.CharField(max_length=settings.MAX_LENGTH, null=True, blank=True)
 
-
-class Text(TranslatableModel):
-    tranaslations = TranslatedFields(
-        Text = models.TextField(null=True, blank=True)
-    )
+class Text(models.Model):
+    Text = models.TextField(null=True, blank=True)
 
 class Key(models.Model):
     KeyValues = models.ManyToManyField('ComponentValueSet', blank=True, related_name='+')

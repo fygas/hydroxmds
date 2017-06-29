@@ -1,6 +1,6 @@
 Constraint_types = (
     (None, 'None'),
-    ('Attachment', 'Attachmetn'),
+    ('Attachment', 'Attachment'),
     ('Content', 'Content')
 )
 Organisation_types = (
@@ -11,7 +11,7 @@ Organisation_types = (
     ('OrganisationUnit', 'OranisationUnit'),
 )
 dimension_types = (
-    ("dimension", "dimenstion"),
+    ("dimension", "dimension"),
     ("measureDimension", "measureDimension")
 )
 object_types = (

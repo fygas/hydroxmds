@@ -39,21 +39,24 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.staticfiles',
     # third party apps
+    'rest_framework',
+    'django_tables2',
     'crispy_forms',
     'django_fullclean',
-    'hvad',
+    # 'hvad',
     # my apps
-    'sdmx',
-    'common',
-    'structure',
-    'organisation',
+    # 'sdmx',
+    'sdmx.apps.SdmxConfig',
+    'common.apps.CommonConfig',
+    'hybrid.apps.HybridConfig',
+    'structure.apps.StructureConfig',
     # 'structure.categorisation',
-    # 'structure.category',
-    # 'structure.codelist',
-    # 'structure.concept',
+    # 'structure.category', 
+    'structure.codelist.apps.CodelistConfig',
+    # 'structure.concept.apps.ConceptConfig',
     # 'structure.constraint',
-    # 'structure.data_structure',
-    # 'structure.dataflow',
+    'structure.data_structure.apps.DataStructureConfig',
+    'structure.dataflow.apps.DataflowConfig',
     # 'structure.hierarchical_codelist',
     # 'structure.metadata_structure',
     # 'structure.metadataflow',
@@ -160,3 +163,4 @@ MAX_LENGTH = 255
 
 # Crispy forms settings
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
+DJANGO_TABLES2_TEMPLATE = 'django_tables2/bootstrap-responsive.html'

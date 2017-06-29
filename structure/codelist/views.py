@@ -1,10 +1,10 @@
-from extra_views import CreateWithInlinesView
 from .models import Codelist
-from .forms import CodeFormSet
+from .forms import CodelistForm 
+from django.views.generic.edit import CreateView 
 
 
 # Create your views here.
-class CodelistCreateView(CreateWithInlinesView):
+class CodelistCreate(CreateView):
+    form_class = CodelistForm
     model = Codelist
-    inlines = [CodeFormSet]
-    fields = '__all__'
+

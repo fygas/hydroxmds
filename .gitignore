@@ -12,6 +12,9 @@ Session.vim
 # auto-generated tag files
 tags
 
+# Orig files
+[._]*.orig
+
 #PYTHON
 # Byte-compiled / optimized / DLL files
 __pycache__/

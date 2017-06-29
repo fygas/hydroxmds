@@ -1,4 +1,3 @@
-{% load staticfiles %}
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -19,20 +18,26 @@
                         <span class="icon-bar"></span>
                     </button>
 
-                    <a class="navbar-brand" href="{% url 'base' %}">{% block title_name %}HydroSDMX{% endblock title_name %}</a>
+                    <a class="navbar-brand" href="{% url 'home' %}">{% block title_name %}HydroSDMX{% endblock title_name %}</a>
                 </div>
 
                 <div id="navbar" class="navbar-collapse collapse">
                     <ul class="nav navbar-nav">
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Hybrid<span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#">Organisations</a></li>
+                                <li><a href="#">Contacts</a></li>
+                            </ul>
+                        </li>
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Data<span class="caret"></span></a>
                         </li>
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Metadata<span class="caret"></span></a>
                             <ul class="dropdown-menu">
-                                <li><a href="#">Add Organisation Scheme</a></li>
-                                <li><a href="#">Edit Organisation Scheme</a></li>
-                                <li><a href="#">Codelists</a></li> 
+                                <li><a href="#">Organisations</a></li>
+                                <li><a href="#">Codelists</a></li>
                             </ul>
                             {# <li><a href="#">Something else here</a></li> #}
                             {# <li role="separator" class="divider"></li> #}
@@ -54,15 +59,17 @@
         <div class="container">
             {% block jumbotron %}
             <!-- Main component for a primary marketing message or call to action -->
-            <div class="jumbotron">
+            <!-- <div class="jumbotron">
                 <h1>HydroSDMX</h1>
-                <p>A Django implementation of SDMX</p>
-            </div>
+            </div> -->
             {% endblock jumbotron %}
         </div> <!-- /container -->
 
-        {% block content %}{% endblock content %}
+        {% block content %}
+        {% block contenttitle %}
+        {% endblock contenttitle %}
+        {% endblock content %}
 
-        {% include "static_top_navbar/base_js.html" %}
+        {% include "base_js.html" %}
     </body>
 </html>

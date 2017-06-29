@@ -1,12 +1,7 @@
-{% extends "base1.html" %}
+{% extends "bas1.html" %}
 {% load crispy_forms_tags %}
 
 
 {% block content %}
-<form action="" method="post">
-    {% csrf_token %}  
-    {{ form|crispy }}
-    <input type="submit" value="OK">
-</form>
+    {% crispy form %}
 {% endblock content %}
-

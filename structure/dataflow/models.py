@@ -1,10 +1,8 @@
 from django.db import models
-from hvad.models import TranslatedFields
 
-from ..models import NameableArtefact 
-from common.models import Reference
+from ..models import MaintainableArtefact 
+from ..data_structure.models import DataStructure
 
 #Dataflow Structure
-class Dataflow(NameableArtefact):
-    structure = models.ForeignKey(Reference, null=True, blank=True)
-    translations = TranslatedFields()
+class Dataflow(MaintainableArtefact):
+    structure = models.ForeignKey(DataStructure, null=True, blank=True)

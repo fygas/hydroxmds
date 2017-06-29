@@ -1,34 +1,36 @@
-from hvad.admin import TranslatableAdmin
-from django.utils.translation import ugettext as _
+from django.contrib import admin
+from .models import (
+    TextFormatInfo, Representation, ConceptTag, ConceptScheme, Concept
+)
 
-class ItemSchemeAdmin(TranslatableAdmin):
-    change_form_template = 'sdmx/admin/change_form.html'
+class NameableAdmin(admin.ModelAdmin):
+    search_fields = ['id_code', 'name']
+    filter_horizontal = ['annotations']
 
-    def get_fieldsets(self, request, obj=None):
-        return (
-            (_('Common fields'), {
-                'fields': (
-                    'id_code', 'annotations', 'uri', 'version', 'validFrom', \
-                    'validTo', 'agencyID', 'isFinal'
-                )
-            }),
-            (_('Translated fields'), {
-                'fields': ('name', 'description')
-            })
-        )
+class ItemSchemeAdmin(NameableAdmin):
+    pass
 
+class ItemAdmin(NameableAdmin):
+    pass
 
-class ItemAdmin(TranslatableAdmin):
-    extra = None 
-    change_form_template = 'sdmx/admin/change_form.html'
+class TextFormatInfoAdmin(admin.ModelAdmin):
+    pass
 
-    def get_fieldsets(self, request, obj=None):
-        if not self.extra: self.extra = []
-        return (
-            (_('Common fields'), {
-                'fields': ['id_code', 'annotations', 'uri'] + self.extra
-            }),
-            (_('Translated fields'), {
-                'fields': ('name', 'description')
-            })
-        )
+class RepresentationAdmin(admin.ModelAdmin):
+    pass
+
+class ConceptTagAdmin(NameableAdmin):
+    pass
+
+class ConceptSchemeAdmin(NameableAdmin):
+    pass
+
+class ConceptAdmin(admin.ModelAdmin):
+    search_fields = ['concept_tag__id_code', 'concept_tag__name']
+
+admin.site.register(TextFormatInfo, TextFormatInfoAdmin)
+admin.site.register(Representation, RepresentationAdmin)
+admin.site.register(ConceptTag, ConceptAdmin)
+admin.site.register(ConceptScheme, ConceptSchemeAdmin)
+admin.site.register(Concept, ConceptAdmin)
+
