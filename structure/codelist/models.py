@@ -5,9 +5,9 @@ from django.db import models
 from common.validators import re_validators
 from django.urls import reverse
 
-from structure.models import ItemScheme, Item
+from structure.models import NameableArtefact, MaintainableArtefact 
 
-class Codelist(ItemScheme):
+class Codelist(MaintainableArtefact):
     id_code = models.CharField(
         'id', max_length=settings.MAX_LENGTH, \
         validators=[re_validators['NCNameIDType']], \
@@ -16,14 +16,14 @@ class Codelist(ItemScheme):
     def get_absolute_url(self):
         return reverse('structure:codelist:codelist-index')
 
-class Code(Item):
-    codelist = models.ForeignKey(Codelist, on_delete=models.CASCADE, related_name='codes')
+class Code(NameableArtefact):
+    wrapper = models.ForeignKey(Codelist, verbose_name='Codelist', on_delete=models.CASCADE, related_name='codes')
     parent = models.ForeignKey(
         'self', on_delete=models.CASCADE, null=True, blank=True
     )
 
     class Meta:
-        unique_together = ('codelist', 'id_code')
+        unique_together = ('wrapper', 'id_code')
 
     def clean(self):
         if self.parent:

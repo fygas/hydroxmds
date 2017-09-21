@@ -31,39 +31,27 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    # django apps
+    #### DJANGO APPLICATIONS #### 
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.messages',
     'django.contrib.sessions',
     'django.contrib.staticfiles',
-    # third party apps
+
+    #### THIRD PARTY APPLICATIONS ####
     'rest_framework',
     'django_tables2',
     'crispy_forms',
     'django_fullclean',
+    'drf_multiple_model',
+    'treebeard',
     # 'hvad',
-    # my apps
-    # 'sdmx',
+
+    #### MY APPLICATIONS #### 
     'sdmx.apps.SdmxConfig',
-    'common.apps.CommonConfig',
-    'hybrid.apps.HybridConfig',
-    'structure.apps.StructureConfig',
-    # 'structure.categorisation',
-    # 'structure.category', 
-    'structure.codelist.apps.CodelistConfig',
-    # 'structure.concept.apps.ConceptConfig',
-    # 'structure.constraint',
-    'structure.data_structure.apps.DataStructureConfig',
-    'structure.dataflow.apps.DataflowConfig',
-    # 'structure.hierarchical_codelist',
-    # 'structure.metadata_structure',
-    # 'structure.metadataflow',
-    # 'structure.process',
-    # 'structure.provision',
-    # 'structure.reporting_taxonomy',
-    # 'structure.structure_set',
+    'hydro_sdmx.apps.HydroSdmxConfig',
+    #'hydro_sdmx_rest.apps.HydroSdmxRestConfig'
 ]
 
 MIDDLEWARE = [
@@ -72,6 +60,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'hydro_sdmx.middleware.user.CurrentUserMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -164,3 +153,6 @@ MAX_LENGTH = 255
 # Crispy forms settings
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
 DJANGO_TABLES2_TEMPLATE = 'django_tables2/bootstrap-responsive.html'
+REST_FRAMEWORK = {
+    'EXCEPTION_HANDLER': 'rest_framework.views.exception_handler'
+}

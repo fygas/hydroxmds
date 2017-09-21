@@ -1,20 +1,3 @@
-# VIM
-# swap
-[._]*.s[a-v][a-z]
-[._]*.sw[a-p]
-[._]s[a-v][a-z]
-[._]sw[a-p]
-# session
-Session.vim
-# temporary
-.netrwhist
-*~
-# auto-generated tag files
-tags
-
-# Orig files
-[._]*.orig
-
 #PYTHON
 # Byte-compiled / optimized / DLL files
 __pycache__/

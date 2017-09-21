@@ -1,16 +1,39 @@
-from .abstract import IdentifiableArtefact, NameableArtefact, Item, ItemScheme 
+from .abstract import IdentifiableArtefact, NameableArtefact, MaintainableArtefact
 
-from django.urls import reverse
 from common.constants import data_types 
-from common.validators import re_validators 
+from ..validators import re_validators 
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext as _
-from structure.codelist.models import Codelist 
 
 
 #Concrete models
+class Codelist(MaintainableArtefact):
+    id_code = models.CharField(
+        'id', max_length=settings.MAX_LENGTH, \
+        validators=[re_validators['NCNameIDType']], \
+    )
+
+class Code(NameableArtefact):
+    wrapper = models.ForeignKey(Codelist, verbose_name='Codelist', on_delete=models.CASCADE, related_name='codes')
+    parent = models.ForeignKey(
+        'self', on_delete=models.CASCADE, null=True, blank=True
+    )
+
+    class Meta:
+        unique_together = ('wrapper', 'id_code')
+
+    def clean(self):
+        if self.parent:
+            if self.codelist != self.parent.codelist:
+                raise ValidationError({
+                    'parent': ValidationError(
+                        _('''Parent and child codes must belong in the \
+                            same Codelist'''), code='local'
+                    ),
+                })
+
 class TextFormatInfo(NameableArtefact):
     annotations = None
     uri = None
@@ -42,42 +65,25 @@ class Representation(IdentifiableArtefact):
     def __str__(self):
         return '%s-%s-%s-%s' % (self.id_code, self.text_format, self.enumeration, self.enumeration_format)
 
-class ConceptTag(Item):
-    annotations = None
-    description = None
-    id_code = models.CharField(
-        'id', max_length=settings.MAX_LENGTH, \
-        validators=[re_validators['IDType']], \
-        unique=True
-    )
-    uri = None
-
-class ConceptScheme(ItemScheme):
+class ConceptScheme(MaintainableArtefact):
     id_code = models.CharField(
         'id', max_length=settings.MAX_LENGTH, \
         validators=[re_validators['NCNameIDType']], \
     )
-    concepts = models.ManyToManyField(
-        ConceptTag, 
-        through='Concept', 
-        through_fields=('concept_scheme', 'concept_tag'),
-    )
-    def get_absolute_url(self):
-        return reverse('structure:concept:conceptscheme-index')
 
 class Concept(NameableArtefact):
-    id_code=None
-    name=None
-    concept_scheme = models.ForeignKey(ConceptScheme, on_delete=models.CASCADE)
-    concept_tag = models.ForeignKey(ConceptTag, on_delete=models.CASCADE)
-    description = models.TextField(null=True, blank=True)
+    id_code = models.CharField(
+        'id', max_length=settings.MAX_LENGTH, \
+        validators=[re_validators['IDType']], \
+    )
+    wrapper = models.ForeignKey(ConceptScheme, verbose_name='Concept Scheme', on_delete=models.CASCADE)
     representation = models.ForeignKey(Representation, on_delete=models.CASCADE, null=True, blank=True, related_name='+')
     parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
     iso_concept_reference = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='+')
     uri = models.URLField(null=True, blank=True)
 
     class Meta:
-        unique_together = ('concept_scheme', 'concept_tag', 'representation')
+        unique_together = ('id_code', 'wrapper')
     
     def clean(self):
         if self.parent:
@@ -90,4 +96,3 @@ class Concept(NameableArtefact):
                 })
 
     #TODO set validations between representation and codelist
-

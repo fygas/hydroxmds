@@ -1,15 +1,15 @@
 from django.core.management.base import BaseCommand, CommandError
 from pandasdmx import Request
-from hybrid.models import Organisation
-from structure.codelist.models import Codelist, Code
-from structure.models import ConceptTag, ConceptScheme, Concept
+from hydro_sdmx.models import (
+    Organisation, Codelist, Code, ConceptScheme, Concept
+)
 
 class Command(BaseCommand):
     help = 'Get codelist using pandaSDMX and load it to database'
 
     resource2model ={
         'codelist': [Codelist, Code],
-        'conceptscheme': [ConceptScheme, ConceptTag]
+        'conceptscheme': [ConceptScheme, Concept]
     }
 
     def add_arguments(self, parser):
@@ -42,21 +42,10 @@ class Command(BaseCommand):
                 description = value.description.get('en')
             except TypeError:
                 description = None
-            if resource == 'codelist':
-                Cm.objects.update_or_create(
-                    id_code = key,
-                    codelist = wrapper,
-                    name = value.name.get('en'),
-                    description = description,
-                )
-            else:
-                entry, _ = Cm.objects.update_or_create(
-                    id_code = key,
-                    name = value.name.get('en'),
-                )
-                Concept.objects.update_or_create(
-                    concept_scheme = wrapper,
-                    concept_tag = entry,
-                    description = description,
-                )
+            Cm.objects.update_or_create(
+                id_code = key,
+                wrapper = wrapper,
+                name = value.name.get('en'),
+                description = description,
+            )
         self.stdout.write(self.style.SUCCESS('Succesfully loaded %s with id "%s"' % (resource, rscid)))

@@ -1,13 +1,31 @@
 from django.conf import settings
 from django.db import models
-from django.urls import reverse
 
-from common.models import AnnotableArtefact 
-from common.validators import re_validators 
+from ..validators import re_validators 
 from hybrid.models import Organisation
 
+# Abstract models
+
+# The following is concrete that is used in AnnotableArtefact abtract
+# model 
+
+class Annotation(models.Model):
+    annotation_title = models.CharField(max_length=settings.MAX_LENGTH, null=True, blank=True)
+    annotation_type = models.CharField(max_length=settings.MAX_LENGTH, null=True, blank=True)
+    annotation_URL = models.URLField(null=True, blank=True)
+    annotation_text = models.TextField(null=True, blank=True)
+    id_code = models.CharField('id', max_length=settings.MAX_LENGTH, null=True, blank=True)
+
+    def __str__(self):
+        display_name = '%(id_code)s: %(title)s' % \
+                {'title': self.annotation_title, 'id_code': self.id_code}
+        return display_name
 
 # Abstract models
+class AnnotableArtefact(models.Model):
+    annotations = models.ManyToManyField(Annotation, related_name='+', blank=True)
+    class Meta:
+        abstract = True
 class IdentifiableArtefact(AnnotableArtefact):
     uri = models.URLField(null=True, blank=True)
     id_code = models.CharField(
@@ -34,18 +52,6 @@ class NameableArtefact(IdentifiableArtefact):
     def __str__(self):
         return self.name 
 
-class Item(NameableArtefact):
-    id_code = models.CharField(
-        'id', max_length=settings.MAX_LENGTH, \
-        validators=[re_validators['IDType']], \
-        unique=True,
-    )
-    name = models.CharField(max_length=settings.MAX_LENGTH)
-
-    class Meta:
-        abstract = True
-
-
 class VersionableArtefact(NameableArtefact):
     version = models.CharField(
         max_length=settings.MAX_LENGTH, \
@@ -69,23 +75,3 @@ class MaintainableArtefact(VersionableArtefact):
     class Meta:
         unique_together = ('id_code', 'agency', 'version')
         abstract = True
-
-class ItemScheme(MaintainableArtefact):
-    #isPartial = models.BooleanField(default=False)
-
-    class Meta(MaintainableArtefact.Meta):
-        abstract = True
-
-    def get_absolute_url(self):
-        return reverse('%s:%sList' % (self.__class__._meta.app_label,  \
-                                      self.__name__))
-
-# class ItemSchemeMap(MaintainableArtefact):
-#     class Meta:
-#         abstract = True
-#     Source = models.ForeignKey(Reference, on_delete=models.CASCADE, null=True, blank=True)
-#     Target = models.ForeignKey(Reference, on_delete=models.CASCADE, null=True, blank=True)
-
-# class ItemAssociation(ItemSchemeMap):
-#     class Meta:
-#         abstract = True
