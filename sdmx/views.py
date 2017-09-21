@@ -22,7 +22,6 @@ class NotImplemented(APIException):
     default_detail = 'The requested resource is not implemented yet'
     default_code = 'Not implemented'
 
-
 class SdmxMetaDataListMixin:
     allow_empty = False
 

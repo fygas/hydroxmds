@@ -16,7 +16,7 @@ class Source(models.Model):
 
 class BaseRegistration(models.Model, MP_Node):
     created_by = models.ForeignKey(
-        'auth.User', verbose_name=_("created by"), null=True, editable=False, related_name='+' 
+        'contact', verbose_name=_("created by"), null=True, editable=False, related_name='+' 
     )
     creation_date = models.DateTimeField(auto_now_add=True)
     action = models.CharField(choices=ACTIONS)

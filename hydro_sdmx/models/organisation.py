@@ -1,35 +1,28 @@
-from django.contrib.auth.user import User
+from django.contrib.auth.models import User 
 from django.db import models
 
-from .abstract import NameableArtefact, Item
-from ..settings import api_maxlen_settings
-from ..validators import re_validators
+from .abstract import NameableArtefact
+from ..settings import api_maxlen_settings as maxlengths 
+from ..validators import re_validators as revalids
 
 class Organisation(NameableArtefact):
-    id_code = models.CharField(
-        'id', 
-        max_length=api_maxlen_settings.ID_CODE,
-        validators=[re_validators['NCNameIDType']],
-        unique=True
-    )
-    name = models.CharField(max_length=api_maxlen_settings.NAME)
-    parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.PROTECT)
-
-class Contact(Item):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    wrapper = models.ForeignKey(Organisation, on_delete=models.CASCADE)
-    department = models.CharField(max_length=api_maxlen_settings.DEPARTMENT, blank=True)
-    role = models.CharField(max_length=api_maxlen_settings.ROLE, blank=True)
-
-    class Meta:
-        indexes = [
-            models.Index(fields=['id_code']),
-            models.Index(fields=['name']),
-            models.Index(fields=['id_code', 'name']),
-        ]
+    id_code = models.CharField('ID', max_length=maxlengths.ID_CODE,
+                               validators=[revalids['NCNameIDType']],
+                               unique=True)
+    name = models.CharField(max_length=maxlengths.NAME)
+    parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE)
 
     def __str__(self):
-        return 'id_code: %s, name: %s' % (self.id_code, self.name)
+        return '%s:%s' % (self.id_code, self.name)
+
+class Contact(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    organisation = models.ForeignKey(Organisation, on_delete=models.CASCADE)
+    department = models.CharField(max_length=maxlengths.DEPARTMENT, blank=True)
+    role = models.CharField(max_length=maxlengths.ROLE, blank=True)
+
+    def __str__(self):
+        return '%s: %s' % (self.user, self.organisation)
 
 class MultiValue(models.Model):
     contact = models.ForeignKey(Contact, on_delete=models.CASCADE)
@@ -39,16 +32,22 @@ class MultiValue(models.Model):
         unique_together = ['contact', 'value']
 
 class Telephone(MultiValue):
-    value = models.CharField(max_length=api_maxlen_settings.TELEPHONE)
+    value = models.CharField('phone', max_length=maxlengths.TELEPHONE)
 
 class Fax(MultiValue):
-    value = models.CharField(max_length=api_maxlen_settings.TELEPHONE)
+    value = models.CharField('FAX', max_length=maxlengths.TELEPHONE)
+
+    class Meta:
+        verbose_name_plural = 'Faxes'
 
 class X400(MultiValue):
-    value = models.CharField(max_length=api_maxlen_settings.X400)
+    value = models.CharField('X400', max_length=maxlengths.X400)
 
 class URI(MultiValue):
-    value = models.URLField()
+    value = models.URLField('URI')
 
 class Email(MultiValue):
-    value = models.EmailField()
+    value = models.EmailField('email address')
+
+    class Meta:
+        verbose_name_plural = 'email addresses'

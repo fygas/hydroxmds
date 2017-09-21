@@ -26,10 +26,11 @@ class TextFormatInfo(NameableArtefact):
     uri = None
     description = None
     text_type = models.CharField(
-        max_length=api_maxlen_settings.DATA_TYPE, null=True,
-        blank=True, choices=DATA_TYPES
+        max_length=api_maxlen_settings.DATA_TYPE, 
+        blank=True, 
+        choices=DATA_TYPES
     )
-    is_sequence = models.NullBooleanField(null=True, blank=True)
+    is_sequence = models.NullBooleanField(null=True)
     interval = models.DecimalField(null=True, blank=True, max_digits=19, decimal_places=10)
     start_value = models.DecimalField(null=True, blank=True, max_digits=19, decimal_places=10)
     end_value = models.DecimalField(null=True, blank=True, max_digits=19, decimal_places=10)

@@ -40,11 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     #### THIRD PARTY APPLICATIONS ####
-    'rest_framework',
-    'django_tables2',
-    'crispy_forms',
-    'django_fullclean',
-    'drf_multiple_model',
+    #'rest_framework',
+    #'drf_multiple_model',
     'treebeard',
     # 'hvad',
 
