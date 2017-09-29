@@ -17,9 +17,6 @@ class Codelist(MaintainableArtefact):
 
 class Code(ItemWithParent):
     wrapper = models.ForeignKey(Codelist, verbose_name='Codelist', on_delete=models.CASCADE, related_name='codes')
-    parent = models.ForeignKey(
-        'self', on_delete=models.CASCADE, null=True, blank=True
-    )
 
 class TextFormatInfo(NameableArtefact):
     annotations = None
@@ -30,7 +27,7 @@ class TextFormatInfo(NameableArtefact):
         blank=True, 
         choices=DATA_TYPES
     )
-    is_sequence = models.NullBooleanField(null=True)
+    is_sequence = models.NullBooleanField(null=True, blank=True)
     interval = models.DecimalField(null=True, blank=True, max_digits=19, decimal_places=10)
     start_value = models.DecimalField(null=True, blank=True, max_digits=19, decimal_places=10)
     end_value = models.DecimalField(null=True, blank=True, max_digits=19, decimal_places=10)
@@ -46,7 +43,7 @@ class TextFormatInfo(NameableArtefact):
     is_multiLingual = models.NullBooleanField(null=True, blank=True)
 
     def __str__(self):
-        '%s-%s-%s' % (self.id_code, self.name, self.text_type)
+        '%s:%s:%s' % (self.id_code, self.name, self.text_type)
 
 
 class Representation(IdentifiableArtefact):
@@ -56,6 +53,6 @@ class Representation(IdentifiableArtefact):
 
     def __str__(self):
         if self.text_format:
-            return 'Text Format: %s-%s' % (self.text_format.id_code, self.text_format.name)
+            return 'Text:%s:%s' % (self.text_format.id_code, self.text_format.name)
         else:
-            return 'Enumeration: %s-%s' % (self.enumeration.id_code, self.enumeration.name)
+            return 'Enum:%s:%s' % (self.enumeration.id_code, self.enumeration.name)

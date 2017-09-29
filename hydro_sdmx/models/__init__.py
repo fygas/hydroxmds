@@ -2,6 +2,19 @@ from .annotation import Annotation
 from .organisation import (
     Organisation, Contact, Telephone, Fax, X400, URI, Email
 )
+from .registration import Source, MetaStructure
+from .organisation_scheme import (
+    AgencyScheme, DataConsumerScheme, DataProviderScheme,
+    OrganisationUnitScheme
+)
+from .codelist import (
+    Codelist, Code, TextFormatInfo, Representation
+)
+from .conceptscheme import Concept, ConceptScheme
+from .data_structly import (
+    DataStructure, Dataflow, Group, Dimension, ObsValue, Attribute
+)
+
 # from .registration import Source, Dataset, Metadataset, MetaStructure
 # from .organisation_scheme import (
 #     AgencyScheme, DataConsumerScheme, DataProviderScheme,

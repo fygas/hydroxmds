@@ -3,13 +3,13 @@ from django.db import models
 from .abstract_postorg import MaintainableArtefact
 
 class AgencyScheme(MaintainableArtefact):
-    agencies = models.ManyToManyField('Organisation', related_name='agency_schemes')
+    items = models.ManyToManyField('Organisation', verbose_name='agencies', related_name='agency_schemes')
 
 class DataConsumerScheme(MaintainableArtefact):
-    data_consumers = models.ManyToManyField('Organisation', related_name='data_consumer_schemes')
+    items = models.ManyToManyField('Organisation', verbose_name='data consumers', related_name='data_consumer_schemes')
 
 class DataProviderScheme(MaintainableArtefact):
-    data_providers = models.ManyToManyField('Organisation', related_name='data_provider_schemes')
+    items = models.ManyToManyField('Organisation', verbose_name='data providers', related_name='data_provider_schemes')
 
 class OrganisationUnitScheme(MaintainableArtefact):
-    organisation_units = models.ManyToManyField('Organisation', related_name='organisation_unit_schemes')
+    items = models.ManyToManyField('Organisation', verbose_name='Organisation units', related_name='organisation_unit_schemes')

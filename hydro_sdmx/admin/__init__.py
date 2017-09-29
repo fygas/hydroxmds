@@ -1,13 +1,32 @@
 from django.contrib import admin
 
-from ..models import Organisation, Annotation, Contact
+#Importing model objects
+from ..models.annotation import Annotation  
+from ..models.organisation import Organisation, Contact
+from ..models.organisation_scheme import AgencyScheme, DataProviderScheme, DataConsumerScheme, OrganisationUnitScheme
+from ..models.codelist import Code, Codelist, Representation, TextFormatInfo
+from ..models.conceptscheme import Concept, ConceptScheme
 
+#Importing admin objects
 from .annotation import AnnotationAdmin
-from .base import NameableArtefactAdmin
-from .organisation import ContactAdmin
+from .base import NameableArtefactAdmin, ItemAdmin
+from .organisation import ContactAdmin, OrganisationSchemeOrganisationsAdmin
+from .codelist import CodelistAdmin, RepresentationAdmin, TextFormatInfoAdmin
+from .conceptscheme import ConceptAdmin, ConceptSchemeAdmin
+
 admin.site.register(Organisation, NameableArtefactAdmin)
 admin.site.register(Annotation, AnnotationAdmin)
 admin.site.register(Contact, ContactAdmin)
+models = [AgencyScheme, DataConsumerScheme, DataProviderScheme, OrganisationUnitScheme] 
+for model in models:
+    admin.site.register(model, OrganisationSchemeOrganisationsAdmin)
+admin.site.register(Codelist, CodelistAdmin)
+admin.site.register(Code, ItemAdmin)
+admin.site.register(Representation, RepresentationAdmin)
+admin.site.register(TextFormatInfo, TextFormatInfoAdmin)
+admin.site.register(ConceptScheme, ConceptSchemeAdmin)
+admin.site.register(Concept, ConceptAdmin)
+
 # from .base import (
 #     NameableArtefactAdmin, MaintainableArtefactAdmin, ItemAdmin,
 #     IdentifiableArtefactAdmin, StructureItemAdmin

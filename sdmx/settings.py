@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     # 'hvad',
 
     #### MY APPLICATIONS #### 
-    'sdmx.apps.SdmxConfig',
+    #'sdmx.apps.SdmxConfig',
     'hydro_sdmx.apps.HydroSdmxConfig',
     #'hydro_sdmx_rest.apps.HydroSdmxRestConfig'
 ]

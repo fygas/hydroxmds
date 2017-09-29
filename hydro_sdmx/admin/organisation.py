@@ -1,22 +1,34 @@
 from django.contrib import admin
+
+from .base import MaintainableArtefactAdmin
 from ..models import Telephone, Fax, X400, Email, URI
 
-class InfoInline(admin.TabularInline):
-    classes = ['collapse']
+class OrganisationSchemeOrganisationsAdmin(MaintainableArtefactAdmin):
 
-class TelephoneInline(InfoInline):
+    filter_horizontal = ('annotations', 'items')
+    def get_fieldsets(self, request, obj=None):
+        fieldsets = super().get_fieldsets(request, obj)
+        if fieldsets[1][0] == 'items':
+            return fieldsets
+        else:
+            fieldsets.insert(1, ('items', {
+                'fields': ('items',),
+                'classes': ('collapse',)
+            }))
+            return fieldsets 
+class TelephoneInline(admin.TabularInline):
     model = Telephone
 
-class FaxInline(InfoInline):
+class FaxInline(admin.TabularInline):
     model = Fax 
 
-class X400Inline(InfoInline):
+class X400Inline(admin.TabularInline):
     model = X400 
 
-class URIInline(InfoInline):
+class URIInline(admin.TabularInline):
     model = URI 
 
-class EmailInline(InfoInline):
+class EmailInline(admin.TabularInline):
     model = Email 
 
 class ContactAdmin(admin.ModelAdmin):

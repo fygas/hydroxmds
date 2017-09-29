@@ -3,17 +3,15 @@ from django.db import models
 from .abstract import VersionableArtefact
 from .registration import MetaStructure 
 
-from ..settings import api_maxlen_settings
+from ..settings import api_maxlen_settings as maxlengths
 from ..validators import re_validators, clean_validators 
 
 class MaintainableArtefact(VersionableArtefact):
-    id_code = models.CharField(
-        'id', max_length=api_maxlen_settings.ID_CODE,
-        validators=[re_validators['IDType']],
-    )
+    id_code = models.CharField('ID', max_length=maxlengths.ID_CODE,
+                               validators=[re_validators['IDType']])
     agency = models.ForeignKey('Organisation', on_delete=models.CASCADE) 
-    is_final= models.BooleanField(default=False)
-    name = models.CharField(max_length=api_maxlen_settings.NAME)
+    is_final = models.BooleanField(default=False)
+    name = models.CharField(max_length=maxlengths.NAME)
     registrations = models.ManyToManyField(MetaStructure)
 
     class Meta(VersionableArtefact.Meta):
@@ -28,7 +26,7 @@ class MaintainableArtefact(VersionableArtefact):
         ]
 
     def __str__(self):
-        return '%s - %s - %s - %s' % (self.id_code, self.agency, self.version, self.name)
+        return '%s:%s:%s:%s' % (self.id_code, self.agency, self.version, self.name)
 
     def clean(self):
         # Make sure that final structures cannot be modified
@@ -41,15 +39,21 @@ class MaintainableArtefact(VersionableArtefact):
             created = not bool(self.pk)
             action = 'Append' if created else 'Replace'
             from ..utils.permissions import get_current_user
-            created_by = get_current_user()
-            kwargs['registration'] = MetaStructure(created_by=created_by, action=action, interactive=True).save()
+            created_by = get_current_user().contact
+            print(created_by)
+            print(type(created_by))
+            registration = MetaStructure(created_by=created_by, action=action, interactive=True)
+            registration.save()
+            kwargs['registration'] = registration 
+            print(kwargs['registration'])
         self.full_clean()
-        self.registrations.add(kwargs.pop('registration'))
+        registration = kwargs.pop('registration')
         super().save(*args, **kwargs)
+        self.registrations.add(registration)
 
     def delete(self):
         action = 'Delete'
         from ..utils.permissions import get_current_user
-        created_by = get_current_user()
+        created_by = get_current_user().contact
         MetaStructure(created_by=created_by, action=action).save()
         super().delete()

@@ -16,7 +16,7 @@ class Organisation(NameableArtefact):
         return '%s:%s' % (self.id_code, self.name)
 
 class Contact(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='contact')
     organisation = models.ForeignKey(Organisation, on_delete=models.CASCADE)
     department = models.CharField(max_length=maxlengths.DEPARTMENT, blank=True)
     role = models.CharField(max_length=maxlengths.ROLE, blank=True)

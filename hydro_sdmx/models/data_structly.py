@@ -1,36 +1,40 @@
 from django.db import models
 
-from .abstract import AnnotableArtefact, IdentifiableArtefact, StructureItem
+from .abstract import AnnotableArtefact, IdentifiableArtefact
 from .abstract_postorg import MaintainableArtefact
 from .codelist import Representation 
-from .common import Annotation
+from .annotation import Annotation
 from .conceptscheme import Concept, ConceptScheme
 
 from ..constants import DIMENSION_TYPES 
 from ..settings import api_maxlen_settings
+from ..validators import re_validators
 
 class DataStructure(MaintainableArtefact):
     dimension_annotations = models.ManyToManyField(Annotation, related_name='+')
     measure_annotations = models.ManyToManyField(Annotation, related_name='+')
     attribute_annotations = models.ManyToManyField(Annotation, related_name='+')
-    dimensions = models.ManyToManyField(Concept, through='Dimension')
-    obs_value = models.ForeignKey('ObsValue', on_delete=models.CASCADE, related_name='dsds')
-    attributes = models.ManyToManyField(Concept, through='Attribute')
-    groups = models.ManyToManyField('Group', related_name='dsds')
+    dimensions = models.ManyToManyField(Concept, through='Dimension', related_name='dimensions')
+    obs_value = models.ForeignKey('ObsValue', on_delete=models.CASCADE, related_name='+')
+    attributes = models.ManyToManyField(Concept, through='Attribute', related_name='+')
 
 class Dataflow(MaintainableArtefact):
     structure = models.ForeignKey(DataStructure)
 
-class Group(IdentifiableArtefact):
-    
     # It can either be a group of dimensions backward relationship with Dimension.groups
     # field or an attachment_constraint group
-    attachment_constraint = models.ForeignKey('AttachmentConstraint', null=True, blank=True, on_delete=models.CASCADE, related_name='groups')
+class Group(IdentifiableArtefact):
+    id_code = models.CharField('ID', max_length=api_maxlen_settings.ID_CODE,
+                               validators=[re_validators['IDType']])
+    structure = models.ForeignKey(DataStructure, on_delete=models.CASCADE, related_name='groups')
+    
+    # attachment_constraint = models.ForeignKey('AttachmentConstraint', null=True, blank=True, on_delete=models.CASCADE, related_name='+')
 
     class Meta(IdentifiableArtefact.Meta):
-        unique_together = ('id_code', 'attachment_constraint')
+        unique_together = ('id_code', 'structure',)
+        #unique_together = ('id_code', 'structure', 'attachment_constraint')
 
-class Dimension(StructureItem):
+class Dimension(IdentifiableArtefact):
     concept = models.ForeignKey(Concept, on_delete=models.CASCADE)
     wrapper = models.ForeignKey(DataStructure, verbose_name='DSD', on_delete=models.CASCADE)
     dimension_type = models.CharField(max_length=api_maxlen_settings.DIMENSION_TYPE, choices=DIMENSION_TYPES)
@@ -48,7 +52,7 @@ class ObsValue(AnnotableArtefact):
     concept = models.ForeignKey(Concept, on_delete=models.CASCADE, related_name='concept_for_obs_values')
     representation = models.ForeignKey(Representation, on_delete=models.CASCADE, null=True, blank=True, related_name='obs_values')
 
-class Attribute(StructureItem):
+class Attribute(IdentifiableArtefact):
     concept = models.ForeignKey(Concept, on_delete=models.CASCADE, related_name='concept_for_attributes')
     wrapper = models.ForeignKey(DataStructure, verbose_name='DSD', on_delete=models.CASCADE)
     is_concept_role = models.BooleanField(default=True)
