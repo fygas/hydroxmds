@@ -2,7 +2,7 @@ from .annotation import Annotation
 from .organisation import (
     Organisation, Contact, Telephone, Fax, X400, URI, Email
 )
-from .registration import Source, MetaStructure
+from .registration import Source, MetaStructure, Dataset
 from .organisation_scheme import (
     AgencyScheme, DataConsumerScheme, DataProviderScheme,
     OrganisationUnitScheme
@@ -12,8 +12,9 @@ from .codelist import (
 )
 from .conceptscheme import Concept, ConceptScheme
 from .data_structly import (
-    DataStructure, Dataflow, Group, Dimension, ObsValue, Attribute
+    DataStructure, Dataflow, Group, Dimension, Measure, Attribute
 )
+from .provision import DataProvisionAgreement
 
 # from .registration import Source, Dataset, Metadataset, MetaStructure
 # from .organisation_scheme import (

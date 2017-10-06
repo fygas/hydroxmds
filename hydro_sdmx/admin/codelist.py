@@ -1,41 +1,49 @@
-from django.contrib import admin
-from .base import ItemStackedInline, MaintainableArtefactAdmin, IdentifiableArtefactAdmin
+from nested_admin import NestedModelAdmin
+
+from .annotation import AnnotationNestedStackedInline 
+from .base import ItemWithParentAdmin, MaintainableArtefactAdmin
+from .base_nested_inline import ItemWithParentNestedStackedInline
 from ..models.codelist import Code 
 
-# class CodeTabularInline(ItemTabularInline):
-#     model = Code
-
-class CodeStackedInline(ItemStackedInline):
+class CodeNestedStackedInline(ItemWithParentNestedStackedInline):
     model = Code
+    inlines = [AnnotationNestedStackedInline,]
 
-class CodelistAdmin(MaintainableArtefactAdmin):
-    inlines = [CodeStackedInline]
+class CodelistAdmin(NestedModelAdmin, MaintainableArtefactAdmin):
+    inlines = [CodeNestedStackedInline, AnnotationNestedStackedInline]
 
-class TextFormatInfoAdmin(admin.ModelAdmin):
-    search_fields = ['id_code', 'name', 'text_type']
-    list_display = ('id_code', 'name', 'text_type')
-    list_display_links = ('id_code',)
-    fieldsets = [ 
-        (None, {
-            'fields': (('id_code', 'name', 'text_type'),),
-        }),
-        ('Additional information', {
-            'fields': (('start_value', 'end_value'),
-                       ('time_interval', 'start_time', 'end_time'), 
-                       ('min_length', 'max_length'),
-                       ('min_value', 'max_value'),
-                       'decimals',
-                       'pattern',
-                       'is_multiLingual'),
-            'classes': ('collapse',)
-        }),
-    ] 
+class CodeAdmin(ItemWithParentAdmin):
+    pass
 
-class RepresentationAdmin(IdentifiableArtefactAdmin):
-    def get_fieldsets(self, request, obj=None):
-        fieldsets = super().get_fieldsets(request, obj)
-        fieldsets[0][1]['fields'] = ('id_code', 
-                                     'text_format',
-                                     ('enumeration', 'enumeration_format')
-                                    ) 
-        return fieldsets 
+# class TextFormatNestedStackedBaseInline(NestedStackedInline):
+#     model = TextFormat
+#     fieldsets = [ 
+#         (None, {
+#             'fields': ('text_type',),
+#         }),
+#         ('Additional information', {
+#             'fields': (('start_value', 'end_value'),
+#                        ('time_interval', 'start_time', 'end_time'), 
+#                        ('min_length', 'max_length'),
+#                        ('min_value', 'max_value'),
+#                        'decimals',
+#                        'pattern',
+#                        'is_multiLingual'),
+#             'classes': ('collapse',)
+#         }),
+#     ] 
+#
+# class TextFormatNestedStackedInline(TextFormatNestedStackedBaseInline):
+#     fk_name = 'text_format'
+#
+# class EnumerationFormatNestedStackedInline(TextFormatNestedStackedBaseInline):
+#     fk_name = 'enumeration_format'
+#
+# class RepresentationNestedStackedInline(NestedStackedInline):
+#     model = Representation 
+#     fieldsets = [ 
+#         (None, {
+#             'fields': ('codelist',),
+#         }),
+#     ] 
+#     inlines = [TextFormatNestedStackedInline, EnumerationFormatNestedStackedInline]

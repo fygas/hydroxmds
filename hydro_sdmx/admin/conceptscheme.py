@@ -1,34 +1,28 @@
-
-from .base import MaintainableArtefactAdmin, ItemAdmin, ItemStackedInline
+from nested_admin import NestedModelAdmin
+from .codelist import RepresentationNestedStackedInline
+from .base import RepresentedItemWithParentAdmin, MaintainableArtefactAdmin
+from .base_nested_inline import RepresentedItemWithParentNestedStackedInline 
 
 from ..models.conceptscheme import Concept
 
-class ConceptAdmin(ItemAdmin):
-
+class ConceptAdmin(RepresentedItemWithParentAdmin):
     def get_fieldsets(self, request, obj=None):
         fieldsets = super().get_fieldsets(request, obj)
-        fieldsets[1][1]['fields'] = (
-            'representation',
-            'parent',
-            'iso_concept_reference',
+        fieldsets[-1][1]['fields'] = (
+            ('parent','iso_concept_reference'),
             ('description', 'uri'), 
-            'annotations'
         ) 
         return fieldsets 
 
-class ConceptStackedInline(ItemStackedInline):
+class ConceptNestedStackedInline(RepresentedItemWithParentNestedStackedInline):
     model = Concept
     def get_fieldsets(self, request, obj=None):
         fieldsets = super().get_fieldsets(request, obj)
-        fieldsets[1][1]['fields'] = (
-            'representation',
-            'parent',
-            'iso_concept_reference',
+        fieldsets[-1][1]['fields'] = (
+            ('parent','iso_concept_reference'),
             ('description', 'uri'), 
-            'annotations'
         ) 
         return fieldsets 
 
-class ConceptSchemeAdmin(MaintainableArtefactAdmin):
-    inlines = [ConceptStackedInline]
-
+class ConceptSchemeAdmin(NestedModelAdmin, MaintainableArtefactAdmin):
+    inlines = [ConceptNestedStackedInline, AnnotationNestedStackedInline]

@@ -12,7 +12,6 @@ from ..constants import ACTIONS
 from ..settings import api_maxlen_settings 
 from ..validators import clean_validators
 
-
 class DataKeyBase(models.model):
     registrations = models.ManyToManyField(Dataset, editable=False, related_name='+')
     attached_attrs = models.ManyToManyField('AttrValue')
@@ -44,7 +43,7 @@ class DataPartialKeyValue(models.Model):
     data_partial_key = models.ForeignKey(DataPartialKey, on_delete=models.CASCADE, related_name = 'dim_values')
     dimension = models.ForeignKey(Dimension)
     code_value = models.ForeignKey(Code, on_delete=models.CASCADE)
-    string_value = models.ForeignKey('DataDimensionString', null=True, blank=True, on_delete=models.CASCADE)
+    string_value = models.ForeignKey('StringDataDimension', null=True, blank=True, on_delete=models.CASCADE)
 
 class DataMeasureKey(DataKeyBase):
     data_partial_key = models.ForeignKey(DataPartialKey, on_delete=models.CASCADE)
@@ -111,8 +110,8 @@ class MetadataDataAttributeOrderedValue(models.Model):
 class MetadataDataAttributeString(models.Model):
     value = models.TextField()
 
-class DataDimensionString(models.Model):
-    value = models.CharField(max_length=api_maxlen_settings.DATA_DIMENSION, null=True, blank=True)
+class StringDataDimension(models.Model):
+    value = models.CharField(max_length=api_maxlen_settings.DATA_DIMENSION, blank=True)
 
 class TimeValue(models.Model):
     time = models.CharField(max_length=api_maxlen_settings.TIME_PERIOD, null=True, blank=True)

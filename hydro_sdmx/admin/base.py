@@ -1,10 +1,7 @@
 from django.contrib import admin
+from .annotation import AnnotationInline
 
-class AnnotableArtefactAdmin(admin.ModelAdmin):
-    filter_horizontal = ('annotations',)
-    list_display = ('id',)
-
-class IdentifiableArtefactAdmin(AnnotableArtefactAdmin):
+class IdentifiableArtefactAdmin(admin.ModelAdmin):
     search_fields = ['id_code']
     list_display = ('id_code',)
     list_display_links = ('id_code',)
@@ -16,14 +13,23 @@ class IdentifiableArtefactAdmin(AnnotableArtefactAdmin):
             'fields': ('uri',),
             'classes': ('collapse',)
         }),
-        ('Annotations', {
-            'fields': ('annotations',),
+    ] 
+    inlines = [AnnotationInline,]
+
+class NameableArtefactAdmin(IdentifiableArtefactAdmin):
+    fieldsets = [ 
+        (None, {
+            'fields': (
+                ('id_code', 'name',),
+            )
+        }),
+        ('Additional information', {
+            'fields': (
+                ('description', 'uri',),
+            ),
             'classes': ('collapse',)
         }),
     ] 
-
-class NameableArtefactAdmin(IdentifiableArtefactAdmin):
-
     def get_search_fields(self, request):
         search_fields = super().get_search_fields(request)
         search_fields.append('name')
@@ -33,81 +39,179 @@ class NameableArtefactAdmin(IdentifiableArtefactAdmin):
         display = super().get_list_display(request)
         return display + ('name',)
 
-    def get_fieldsets(self, request, obj=None):
-        fieldsets = super().get_fieldsets(request, obj)
-        fieldsets[0][1]['fields'] = (('id_code', 'name'),) 
-        fieldsets[1][1]['fields'] = (('description', 'uri'),)
-        return fieldsets 
-
 class VersionableArtefactAdmin(NameableArtefactAdmin):
-
-    list_filter = 'version',
+    fieldsets = [ 
+        (None, {
+            'fields': (
+                ('id_code', 'name',),
+                'version',
+            )
+        }),
+        ('Additional information', {
+            'fields': (
+                ('valid_from', 'valid_to'), 
+                ('description', 'uri',),
+            ),
+            'classes': ('collapse',)
+        }),
+    ] 
 
     def get_search_fields(self, request):
         search_fields = super().get_search_fields(request)
         search_fields.append('version')
         return search_fields
 
-    def get_list_display(self, request):
-        display = super().get_list_display(request)
-        return display + ('version',)
-
-    def get_fieldsets(self, request, obj=None):
-        fieldsets = super().get_fieldsets(request, obj)
-        fieldsets[0][1]['fields'] = (('id_code', 'name', 'version'),) 
-        fieldsets[1][1]['fields'] =  (
-            ('valid_from', 'valid_to'), 
-            ('description', 'uri'), 
-        )
-        return fieldsets 
-
 class MaintainableArtefactAdmin(VersionableArtefactAdmin):
-
-    def get_fieldsets(self, request, obj=None):
-        fieldsets = super().get_fieldsets(request, obj)
-        fieldsets[0][1]['fields'] = (('id_code', 'name', 'version'), 'agency') 
-        return fieldsets 
-
-    def get_list_filter(self, request):
-        list_filter = list(super().get_list_filter(request))
-        list_filter.append('agency')
-        return tuple(list_filter)
-
-
-class ItemTabularInline(admin.TabularInline):
-    classes = ['collapse']
-
-class ItemBaseStackedInline(admin.StackedInline):
-    classes = ['collapse']
-
-class ItemStackedInline(ItemBaseStackedInline):
-    filter_horizontal = ('annotations',)
     fieldsets = [ 
         (None, {
-            'fields': (('id_code', 'name'),),
+            'fields': (
+                ('id_code', 'name',),
+                ('agency', 'version',),
+            )
         }),
         ('Additional information', {
-            'fields': (('description', 'uri',),),
+            'fields': (
+                ('valid_from', 'valid_to'), 
+                ('description', 'uri',),
+            ),
             'classes': ('collapse',)
         }),
-        ('Annotations', {
-            'fields': ('annotations',),
-            'classes': ('collapse',),
-        }),
     ] 
+    list_filter = ['version', 'agency']
 
 class ItemAdmin(NameableArtefactAdmin):
-    actions = None
-    list_display_links = None
+    # actions = None
+    # list_display_links = None
     list_filter = ['wrapper']
-
-    def has_add_permission(self, request):
-        return False
+    fieldsets = [ 
+        (None, {
+            'fields': (
+                'wrapper',
+                ('id_code', 'name',),
+            )
+        }),
+        ('Additional information', {
+            'fields': (
+                ('description', 'uri',),
+            ),
+            'classes': ('collapse',)
+        }),
+    ] 
 
     def get_search_fields(self, request):
         search_fields = super().get_search_fields(request)
         search_fields.append('wrapper__id_code')
         return search_fields
+
+class RepresentedItemAdmin(ItemAdmin):
+    fieldsets = [ 
+        (None, {
+            'fields': (
+                'wrapper',
+                ('id_code', 'name',),
+            )
+        }),
+        ('Representation', {
+            'fields': (
+                ('enumeration', 'text_type',),
+            )
+        }),
+        ('Optional Representation', {
+            'fields': (
+                ('start_value', 'end_value'),
+                ('time_interval', 'start_time', 'end_time'), 
+                ('min_length', 'max_length'),
+                ('min_value', 'max_value'),
+                'decimals',
+                'pattern',
+                'is_multiLingual'),
+            'classes': ('collapse',)
+        }),
+        ('Additional information', {
+            'fields': (
+                ('description', 'uri',),
+            ),
+            'classes': ('collapse',)
+        }),
+    ]
+     
+class ItemWithParentAdmin(ItemAdmin):
+    fieldsets = [ 
+        (None, {
+            'fields': (
+                'wrapper',
+                ('id_code', 'name',),
+            )
+        }),
+        ('Additional information', {
+            'fields': (
+                'parent',
+                ('description', 'uri',),
+            ),
+            'classes': ('collapse',)
+        }),
+    ] 
+
+class RepresentedItemWithParentAdmin(ItemAdmin):
+    fieldsets = [ 
+        (None, {
+            'fields': (
+                'wrapper',
+                ('id_code', 'name',),
+            )
+        }),
+        ('Representation', {
+            'fields': (
+                ('enumeration', 'text_type',),
+            )
+        }),
+        ('Optional Representation', {
+            'fields': (
+                ('start_value', 'end_value'),
+                ('time_interval', 'start_time', 'end_time'), 
+                ('min_length', 'max_length'),
+                ('min_value', 'max_value'),
+                'decimals',
+                'pattern',
+                'is_multiLingual'),
+            'classes': ('collapse',)
+        }),
+        ('Additional information', {
+            'fields': (
+                'parent',
+                ('description', 'uri',),
+            ),
+            'classes': ('collapse',)
+        }),
+    ]
+
+# class ItemCompTabularInline(admin.TabularInline):
+#     classes = ['collapse']
+#
+# class ItemCompBaseStackedInline(admin.StackedInline):
+#     classes = ['collapse']
+#
+# class ItemStackedInline(ItemCompBaseStackedInline):
+#     fieldsets = [ 
+#         (None, {
+#             'fields': (('id_code', 'name'),),
+#         }),
+#         ('Additional information', {
+#             'fields': (('description', 'uri',),),
+#             'classes': ('collapse',)
+#         }),
+#     ] 
+#
+# class ComponentStackedInline(ItemCompBaseStackedInline):
+#     fieldsets = [ 
+#         (None, {
+#             'fields': (
+#                 ('id_code', 'concept'),
+#                 'representation',
+#             ),
+#         }),
+#     ] 
+
 
 # from django.contrib import admin
 # from ..forms import RegistrationForm 

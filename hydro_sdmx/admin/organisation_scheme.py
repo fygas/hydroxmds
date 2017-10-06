@@ -1,7 +1,7 @@
 from nested_admin import NestedTabularInline, NestedStackedInline, NestedModelAdmin
 
 from .annotation import AnnotationNestedStackedInline
-from .base import NameableArtefactAdmin, MaintainableArtefactAdmin
+from .base import NameableArtefactAdmin
 from ..models import Telephone, Fax, X400, Email, URI, Contact
 
 
@@ -50,6 +50,3 @@ class OrganisationAdmin(NestedModelAdmin, NameableArtefactAdmin):
             'classes': ('collapse',)
         }),
     ]
-
-class OrganisationSchemeAdmin(MaintainableArtefactAdmin):
-    pass

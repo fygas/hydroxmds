@@ -1,44 +1,83 @@
-from ..models.data_structly import Dimension, Attribute
-from .base import ItemBaseStackedInline, MaintainableArtefactAdmin
+from nested_admin import TabularInline, NestedModelAdmin
+from ..models.data_structly import Dimension, Attribute, Measure, Group
+from .annotation import AnnotationNestedStackedInline
+from .base import MaintainableArtefactAdmin 
+from .base_nested_inline import RepresentedItemNestedStackedInline
 
-class DimensionInline(ItemBaseStackedInline):
+class GroupNestedStackedInline(TabularInline):
+    model = Group
+    fields = ('id_code',)
+
+class DimensionNestedStackedInline(RepresentedItemNestedStackedInline):
     model = Dimension
-    filter_horizontal = ('annotations', 'roles', 'groups')
+    filter_horizontal = ('roles',)
     fieldsets = [ 
         (None, {
             'fields': (
-                ('id_code', 'concept'),
-                ('dimension_type', 'representation', 'measure_representation'),
-                'position'
-            ),
+                ('dimension_type', 'id_code'),
+                ('concept', 'position'),
+            )
         }),
-        ('Additional information', {
+        ('Representation', {
             'fields': (
-                ('is_concept_role', 'roles'),
-                'groups'
+                ('enumeration', 'text_type',),
+            )
+        }),
+        ('Optional Representation', {
+            'fields': (
+                ('start_value', 'end_value'),
+                ('time_interval', 'start_time', 'end_time'), 
+                ('min_length', 'max_length'),
+                ('min_value', 'max_value'),
+                'decimals',
+                'pattern',
+                'is_multiLingual'),
+            'classes': ('collapse',)
+        }),
+        ('Measure Representation', {
+            'fields': (
+                ('measure_representation',),
             ),
             'classes': ('collapse',)
         }),
-        ('Annotations', {
-            'fields': ('annotations',),
-            'classes': ('collapse',),
+        ('Additional information', {
+            'fields': (
+                ('is_concept_role', 'uri'),
+                ('roles',),
+            ),
+            'classes': ('collapse',)
         }),
     ] 
+    inlines = (GroupNestedStackedInline, AnnotationNestedStackedInline )
 
-class AttributeInline(ItemBaseStackedInline):
+class AttributeNestedStackedInline(RepresentedItemNestedStackedInline):
     model = Attribute 
-    filter_horizontal = ('annotations', 'attached2dims', 'attached2groups')
+    filter_horizontal = ('roles', 'attached2dims', 'attached2groups')
     fieldsets = [ 
         (None, {
             'fields': (
-                ('id_code', 'concept'),
-                ('representation', 'required'),
+                ('id_code', 'concept', 'required'),
             ),
+        }),
+        ('Representation', {
+            'fields': (
+                ('enumeration', 'text_type',),
+            )
+        }),
+        ('Optional Representation', {
+            'fields': (
+                ('start_value', 'end_value'),
+                ('time_interval', 'start_time', 'end_time'), 
+                ('min_length', 'max_length'),
+                ('min_value', 'max_value'),
+                'decimals',
+                'pattern',
+                'is_multiLingual'),
+            'classes': ('collapse',)
         }),
         ('Additional information', {
             'fields': (
                 ('is_concept_role', 'roles'),
-                'groups'
             ),
             'classes': ('collapse',)
         }),
@@ -51,40 +90,45 @@ class AttributeInline(ItemBaseStackedInline):
             ),
             'classes': ('collapse',)
         }),
-        ('Annotations', {
-            'fields': ('annotations',),
-            'classes': ('collapse',),
-        }),
     ] 
 
-class DataStructureAdmin(MaintainableArtefactAdmin):
-    filter_horizontal = ('annotations', 'dimension_annotations', 'measure_annotations', 'attribute_annotations')
+class MeasureNestedStackedInline(RepresentedItemNestedStackedInline):
+    model = Measure 
     fieldsets = [ 
         (None, {
-            'fields': ('id_code', 'name', 'version'),
-        }),
-        ('Additional information', {
-            'classes': ('collapse',),
             'fields': (
-                ('description', 'uri'),
-                'annotations'
+                ('id_code', 'concept',),
             )
         }),
+        ('Representation', {
+            'fields': (
+                ('enumeration', 'text_type',),
+            )
+        }),
+        ('Optional Representation', {
+            'fields': (
+                ('start_value', 'end_value'),
+                ('time_interval', 'start_time', 'end_time'), 
+                ('min_length', 'max_length'),
+                ('min_value', 'max_value'),
+                'decimals',
+                'pattern',
+                'is_multiLingual'),
+            'classes': ('collapse',)
+        }),
     ] 
+    max_num = 1
+    extra = 1
 
-# from .base import IdentifiableArtefactAdmin
-# from django.contrib import admin
-# from ..models.data_structly import Dimension, Attribute
-# class DimensionAdmin(IdentifiableArtefactAdmin):
-#     filter_horizontal = ('annotations', 'roles', 'groups')
-#     search_fields = ['wrapper', 'id_code', 'concept']
-#     list_display = ('id_code', 'concept')
-#     list_display_links = ('id_code',)
-#     list_filter = ('wrapper',)
-#
-# class AttributeAdmin(IdentifiableArtefactAdmin):
-#     filter_horizontal = ('annotations', 'roles', 'attached2dims', 'attached2groups')
-#     search_fields = ['wrapper', 'id_code', 'concept']
-#     list_display = ('id_code', 'concept')
-#     list_display_links = ('id_code',)
-#     list_filter = ('wrapper',)
+class DataStructureAdmin(MaintainableArtefactAdmin, NestedModelAdmin):
+    inlines = [DimensionNestedStackedInline, MeasureNestedStackedInline, AttributeNestedStackedInline]
+
+class DataflowAdmin(MaintainableArtefactAdmin):
+    def get_fieldsets(self, request, obj=None):
+        fieldsets = super().get_fieldsets(request, obj)
+        fieldsets[0][1]['fields'] = (
+            ('id_code', 'name'), 
+            ('agency', 'version'),
+            'structure',
+        ) 
+        return fieldsets 

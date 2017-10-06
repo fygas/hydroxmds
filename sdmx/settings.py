@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     #### THIRD PARTY APPLICATIONS ####
     #'rest_framework',
     #'drf_multiple_model',
+    'nested_admin',
+    'admin_reorder',
     'treebeard',
     # 'hvad',
 
@@ -58,6 +60,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'hydro_sdmx.middleware.user.CurrentUserMiddleware',
+    'admin_reorder.middleware.ModelAdminReorder',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -153,3 +156,42 @@ DJANGO_TABLES2_TEMPLATE = 'django_tables2/bootstrap-responsive.html'
 REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'rest_framework.views.exception_handler'
 }
+ADMIN_REORDER = (
+    'auth',
+    {'app': 'hydro_sdmx', 'label': 'Organisation related models',
+     'models': (
+         'hydro_sdmx.Organisation', 
+         'hydro_sdmx.Contact', 
+         'hydro_sdmx.AgencyScheme', 
+         'hydro_sdmx.DataConsumerScheme',
+         'hydro_sdmx.DataProviderScheme',
+         'hydro_sdmx.OrganisationUnitScheme',
+     )
+    },
+    {'app': 'hydro_sdmx', 'label': 'Annotation model',
+     'models': (
+         'hydro_sdmx.Annotation', 
+     )
+    },
+    {'app': 'hydro_sdmx', 'label': 'Code and representation related models',
+     'models': (
+         'hydro_sdmx.TextFormatInfo', 
+         'hydro_sdmx.Representation', 
+         'hydro_sdmx.Code', 
+         'hydro_sdmx.Codelist', 
+     )
+    },
+    {'app': 'hydro_sdmx', 'label': 'Concept related models',
+     'models': (
+         'hydro_sdmx.Concept', 
+         'hydro_sdmx.ConceptScheme', 
+     )
+    },
+    {'app': 'hydro_sdmx', 'label': 'DSD and dataflows related models',
+     'models': (
+         'hydro_sdmx.DataStructure', 
+         'hydro_sdmx.Dataflow', 
+         'hydro_sdmx.DataProvisionAgreement', 
+     )
+    },
+)

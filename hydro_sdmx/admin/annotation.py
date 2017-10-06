@@ -1,14 +1,23 @@
 from django.contrib import admin
+from nested_admin import NestedStackedInline
+from ..models import Annotation
 
-class AnnotationAdmin(admin.ModelAdmin):
-
-    search_fields = ['id_code', 'annotation_type']
+class AnnotationStackedInline(admin.StackedInline):
+    classes = ['collapse']
+    model = Annotation
+    extra = 1
     fieldsets = (
         (None, {
-            'fields': (('id_code', 'annotation_title'), 'annotation_text'),
+            'fields': ('annotation_text',),
         }),
         ('Additional info', {
-            'fields': ('annotation_type', 'annotation_URL'),
+            'fields': (
+                ('id_code', 'annotation_type'),
+                ('annotation_title', 'annotation_URL'),
+            ),
             'classes': ('collapse',)
         }),
     )
+
+class AnnotationNestedStackedInline(NestedStackedInline, AnnotationStackedInline):
+    pass

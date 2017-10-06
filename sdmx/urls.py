@@ -15,15 +15,19 @@ Including another URLconf
 """
 
 from django.conf import settings
-from django.conf.urls import url
+from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.utils.translation import ugettext_lazy as _
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    url(r'^nested_admin/', include('nested_admin.urls')),
     #url(r'^rest/', include('hydro_sdmx_rest.urls')),
 ]
 
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+admin.site.site_header = _("DjangoSDMX Administration")
