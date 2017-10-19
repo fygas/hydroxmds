@@ -1,16 +1,12 @@
-from nested_admin import TabularInline, NestedModelAdmin
-from ..models.data_structly import Dimension, Attribute, Measure, Group
+from nested_admin import NestedModelAdmin
+from ..models.data_structly import Dimension, Attribute, Group 
 from .annotation import AnnotationNestedStackedInline
 from .base import MaintainableArtefactAdmin 
 from .base_nested_inline import RepresentedItemNestedStackedInline
 
-class GroupNestedStackedInline(TabularInline):
-    model = Group
-    fields = ('id_code',)
-
 class DimensionNestedStackedInline(RepresentedItemNestedStackedInline):
     model = Dimension
-    filter_horizontal = ('roles',)
+    filter_horizontal = ('groups', 'roles',)
     fieldsets = [ 
         (None, {
             'fields': (
@@ -21,7 +17,8 @@ class DimensionNestedStackedInline(RepresentedItemNestedStackedInline):
         ('Representation', {
             'fields': (
                 ('enumeration', 'text_type',),
-            )
+            ),
+            'classes': ('collapse',)
         }),
         ('Optional Representation', {
             'fields': (
@@ -43,12 +40,13 @@ class DimensionNestedStackedInline(RepresentedItemNestedStackedInline):
         ('Additional information', {
             'fields': (
                 ('is_concept_role', 'uri'),
-                ('roles',),
+                'roles',
+                'groups',
             ),
             'classes': ('collapse',)
         }),
     ] 
-    inlines = (GroupNestedStackedInline, AnnotationNestedStackedInline )
+    inlines = (AnnotationNestedStackedInline,)
 
 class AttributeNestedStackedInline(RepresentedItemNestedStackedInline):
     model = Attribute 
@@ -62,7 +60,8 @@ class AttributeNestedStackedInline(RepresentedItemNestedStackedInline):
         ('Representation', {
             'fields': (
                 ('enumeration', 'text_type',),
-            )
+            ),
+            'classes': ('collapse',)
         }),
         ('Optional Representation', {
             'fields': (
@@ -92,21 +91,40 @@ class AttributeNestedStackedInline(RepresentedItemNestedStackedInline):
         }),
     ] 
 
-class MeasureNestedStackedInline(RepresentedItemNestedStackedInline):
-    model = Measure 
+class GroupNestedStackedInline(NestedModelAdmin):
+    model = Group
+    inlines = (AnnotationNestedStackedInline,)
+    classes = ('wrapper')
     fieldsets = [ 
         (None, {
             'fields': (
-                ('id_code', 'concept',),
+                'group_id', 
+                'dimensions',
+                'attachment_constraint'
             )
         }),
-        ('Representation', {
+    ]
+
+class DataStructureAdmin(MaintainableArtefactAdmin, NestedModelAdmin):
+    inlines = [DimensionNestedStackedInline, GroupNestedStackedInline, AttributeNestedStackedInline, AnnotationNestedStackedInline]
+    fieldsets = [ 
+        (None, {
             'fields': (
+                ('id_code', 'name',),
+                ('agency', 'version',),
+            )
+        }),
+        ('Additional information', {
+            'fields': (
+                ('valid_from', 'valid_to'), 
+                ('description', 'uri',),
+            ),
+            'classes': ('collapse',),
+        }),
+        ('Observation', {
+            'fields': (
+                'obs_concept',
                 ('enumeration', 'text_type',),
-            )
-        }),
-        ('Optional Representation', {
-            'fields': (
                 ('start_value', 'end_value'),
                 ('time_interval', 'start_time', 'end_time'), 
                 ('min_length', 'max_length'),
@@ -117,11 +135,7 @@ class MeasureNestedStackedInline(RepresentedItemNestedStackedInline):
             'classes': ('collapse',)
         }),
     ] 
-    max_num = 1
-    extra = 1
-
-class DataStructureAdmin(MaintainableArtefactAdmin, NestedModelAdmin):
-    inlines = [DimensionNestedStackedInline, MeasureNestedStackedInline, AttributeNestedStackedInline]
+    list_filter = ['version', 'agency']
 
 class DataflowAdmin(MaintainableArtefactAdmin):
     def get_fieldsets(self, request, obj=None):

@@ -1,5 +1,5 @@
 from nested_admin import NestedModelAdmin
-from .codelist import RepresentationNestedStackedInline
+from .annotation import AnnotationNestedStackedInline
 from .base import RepresentedItemWithParentAdmin, MaintainableArtefactAdmin
 from .base_nested_inline import RepresentedItemWithParentNestedStackedInline 
 

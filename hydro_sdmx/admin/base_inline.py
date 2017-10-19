@@ -30,7 +30,8 @@ class RepresentedItemStackedInline(ItemBaseStackedInline):
         ('Representation', {
             'fields': (
                 ('enumeration', 'text_type',),
-            )
+            ),
+            'classes': ('collapse',)
         }),
         ('Optional Representation', {
             'fields': (
@@ -58,10 +59,27 @@ class ItemWithParentStackedInline(ItemStackedInline):
                 ('id_code', 'name',),
             )
         }),
+        ('Additional information', {
+            'fields': (
+                'parent',
+                ('description', 'uri',),
+            ),
+            'classes': ('collapse',)
+        }),
+    ] 
+
+class RepresentedItemWithParentStackedInline(ItemWithParentStackedInline, RepresentedItemStackedInline):
+    fieldsets = [ 
+        (None, {
+            'fields': (
+                ('id_code', 'name',),
+            )
+        }),
         ('Representation', {
             'fields': (
                 ('enumeration', 'text_type',),
-            )
+            ),
+            'classes': ('collapse',)
         }),
         ('Optional Representation', {
             'fields': (
@@ -82,6 +100,3 @@ class ItemWithParentStackedInline(ItemStackedInline):
             'classes': ('collapse',)
         }),
     ]
-
-class RepresentedItemWithParentStackedInline(ItemWithParentStackedInline, RepresentedItemStackedInline):
-    pass

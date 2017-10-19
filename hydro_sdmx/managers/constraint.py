@@ -3,12 +3,12 @@ from django.db import models
 class AttachmentConstraintManager(models.Manager):
     def get_queryset(self):
         super_qs = super().get_queryset()
-        return super_qs.prefetch_related('attached2datasets', 'attached2datasources', 'attached2provisions', 'attached2dsds', 'attached2dataflows')
+        return super_qs.prefetch_related('datasets', 'datasources', 'provisions', 'data_structures', 'dataflows')
 
 class ContentConstraintManager(models.Manager):
     def get_queryset(self):
         super_qs = super().get_queryset()
-        return super_qs.select_related('attached2dataset', 'attached2datasource').prefetch_related('attached2dataproviders', 'attached2provisions', 'attached2dsds', 'attached2dataflows')
+        return super_qs.select_related('dataset', 'datasource').prefetch_related('dataproviders', 'provisions', 'data_structures', 'dataflows')
 
 class DataKeySetManager(models.Manager):
     def get_queryset(self):
@@ -18,12 +18,12 @@ class DataKeySetManager(models.Manager):
 class ConstraintDataKeyManager(models.Manager):
     def get_queryset(self):
         super_qs = super().get_queryset()
-        return super_qs.select_related('data_key_set').select_prefetch('key_values')
+        return super_qs.select_related('data_key_set').prefetch_related('key_values')
 
 class KeyValueManager(models.Manager):
     def get_queryset(self):
         super_qs = super().get_queryset()
-        return super_qs.select_related('dimension', 'attribute', 'code_value', 'string_value')
+        return super_qs.select_related('code_value')
 
 class CubeRegionManager(models.Manager):
     def get_queryset(self):

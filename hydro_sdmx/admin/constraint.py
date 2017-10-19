@@ -1,25 +1,120 @@
+from nested_admin import NestedTabularInline, NestedModelAdmin, NestedStackedInline
 
-from nested_admin import NestedTabularInline, NestedModelAdmin
+from ..models.constraint import KeyValue, Key, ConstraintKeySet, CodeValueDetail, KeyValueSet, CubeRegion
+from .annotation import AnnotationNestedStackedInline
+from .base import MaintainableArtefactAdmin
 
-from ..models.data import StringDataDimension
-from ..models.constraint import KeyValue, ConstraintDataKey, DataKeySet 
-
-class StringDataDimensionAdmin(NestedTabularInline):
-    model = StringDataDimension 
-    extra = 1
-    max_num = 1
-
-class KeyValueAdmin(NestedTabularInline):
+class KeyValueNestedTabularInline(NestedTabularInline):
     model = KeyValue
+    raw_id_fields = ('dimensions',)
+    classes = ['collapse']
+    fields = ('component_id', 'code_value', 'string_value')
 
-class ConstraintDataKeyAdmin(NestedTabularInline):
-    model = ConstraintDataKey
+class KeyNestedTabularInline(NestedTabularInline):
+    model = Key 
+    classes = ['collapse']
+    inlines = [KeyValueNestedTabularInline]
 
-class DataKeySetAdmin(NestedTabularInline):
-    model = DataKeySet
+class ConstraintKeySetNestedTabularInline(NestedTabularInline):
+    model = ConstraintKeySet
+    classes = ['collapse']
+    inlines = [KeyNestedTabularInline]
 
-class AttachmentConstraintAdmin(NestedModelAdmin):
-    pass
+class AttachmentConstraintAdmin(MaintainableArtefactAdmin, NestedModelAdmin):
+    fieldsets = [ 
+        (None, {
+            'fields': (
+                ('id_code', 'name',),
+                ('agency', 'version',),
+            )
+        }),
+        ('Attachments', {
+            'fields': (
+                'datasources',
+                'provisions',
+                'dataflows',
+                'data_structures',
+                'datasets', 
+            ),
+            'classes': ('collapse',),
+        }),
+        ('Additional information', {
+            'fields': (
+                ('valid_from', 'valid_to'), 
+                ('description', 'uri',),
+            ),
+            'classes': ('collapse',),
+        }),
+    ] 
+    list_filter = ['version', 'agency', 'dataflows', 'data_structures']
+    inlines = [ConstraintKeySetNestedTabularInline, AnnotationNestedStackedInline]
+
+class CodeValueDetailNestedTabularInline(NestedTabularInline):
+    model = CodeValueDetail
+    fields = ('code', 'cascade')
+    classes = ('collapse',)
+
+class KeyValueSetNestedStackedInline(NestedStackedInline):
+    model = KeyValueSet
+    inlines = [CodeValueDetailNestedTabularInline,]
+    fieldsets = [ 
+        (None, {
+            'fields': ('component_id',),
+        }),
+        ('time_value', {
+            'fields': (
+                ('start_time', 'end_time',),
+                ('start_inclusive', 'end_inclusive',)
+            ),
+            'classes': ('collapse',),
+        }),
+        ('string_values', {
+            'fields': ('string_values',),
+            'classes': ('collapse',),
+        }),
+    ]
+
+class CubeRegionNestedTabularInline(NestedTabularInline):
+    model = CubeRegion 
+    fields = ('include',)
+    inlines = [KeyValueSetNestedStackedInline]
+
+class ContentConstraintAdmin(MaintainableArtefactAdmin, NestedModelAdmin):
+    fieldsets = [ 
+        (None, {
+            'fields': (
+                ('id_code', 'name',),
+                ('agency', 'version',),
+            )
+        }),
+        ('Attachments', {
+            'fields': (
+                'datasource',
+                'provisions',
+                'dataflows',
+                'data_structures',
+                'dataset', 
+            ),
+            'classes': ('collapse',),
+        }),
+        ('Data provider attachments', {
+            'fields': (
+                'dataproviders',
+                ('periodicity', 'offset', 'tolerance'),
+                ('start_time', 'end_time'),
+            ),
+            'classes': ('collapse',),
+        }),
+        ('Additional information', {
+            'fields': (
+                ('valid_from', 'valid_to'), 
+                ('description', 'uri',),
+            ),
+            'classes': ('collapse',),
+        }),
+    ] 
+    list_filter = ['version', 'agency', 'dataflows', 'data_structures']
+    inlines = [ConstraintKeySetNestedTabularInline, CubeRegionNestedTabularInline, AnnotationNestedStackedInline]
 
 # from django.contrib import admin
 #

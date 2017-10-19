@@ -10,7 +10,7 @@ class OrganisationScheme(MaintainableArtefact):
     pass
 
 class Organisation(NameableArtefact, MP_Node):
-    schemes = models.ForeignKey(OrganisationScheme)
+    schemes = models.ManyToManyField(OrganisationScheme, blank=True)
     parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE)
 
     class Meta(NameableArtefact.Meta):
@@ -36,13 +36,12 @@ class Contact(models.Model):
     role = models.CharField(max_length=maxlengths.ROLE, blank=True)
 
     class Meta:
-        abstract = True
         indexes = [ 
             models.Index(fields=['user']),
             models.Index(fields=['organisation']),
             models.Index(fields=['user', 'organisation']),
         ]
-        unique_together = ('contact', 'organisation')
+        unique_together = ('user', 'organisation')
 
     def __str__(self):
         return '%s: %s' % (self.user, self.organisation)

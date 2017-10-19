@@ -3,11 +3,12 @@ from django.db import models
 
 from treebeard.mp_tree import MP_Node
 
-from .registration import MetaStructure 
+from .registration import Registration 
 from ..settings import api_maxlen_settings as maxlengths 
 from ..validators import re_validators, errors, clean_validators
 from ..constants import DATA_TYPES 
 from ..settings import api_maxlen_settings 
+from ..utils.permissions import get_current_user
 
 class IdentifiableArtefact(models.Model):
     uri = models.URLField('URI', null=True, blank=True)
@@ -102,9 +103,29 @@ class ItemWithParent(Item, MP_Node):
             return  #add_root and add_child save as well
         super().save(**kwargs)
 
-class RepresentedItemWithParent(RepresentedItem, ItemWithParent, MP_Node):
+class RepresentedItemWithParent(RepresentedItem, MP_Node):
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True,
+                               blank=True)
+
     class Meta(Item.Meta):
         abstract = True
+
+    def clean(self):
+        if self.parent:
+            if self.wrapper != self.parent.wrapper:
+                raise ValidationError({
+                    'parent': errors['parent'],
+                })
+
+    def save(self, **kwargs):
+        if not self.depth:
+            if self.parent_id:
+                self.depth = self.parent.depth + 1
+                self.parent.add_child(instance=self)
+            else:
+                self.add_root(instance=self)
+            return  #add_root and add_child save as well
+        super().save(**kwargs)
 
 class VersionableArtefact(NameableArtefact):
     version = models.CharField(
@@ -128,7 +149,7 @@ class MaintainableArtefact(VersionableArtefact):
     agency = models.ForeignKey('Organisation', on_delete=models.CASCADE) 
     is_final = models.BooleanField(default=False)
     name = models.CharField(max_length=maxlengths.NAME)
-    registrations = models.ManyToManyField(MetaStructure)
+    registrations = models.ManyToManyField(Registration)
 
     class Meta(VersionableArtefact.Meta):
         abstract = True
@@ -148,30 +169,30 @@ class MaintainableArtefact(VersionableArtefact):
         # Make sure that final structures cannot be modified
         created = not bool(self.pk)
         if not created and self.is_final:
-            raise clean_validators[self.__class__.__name__] 
+            raise clean_validators['MaintainableArtefact']['update']
+        created_by = get_current_user()
+        if not hasattr(created_by, 'contact') and not created_by.is_superuser:
+            raise clean_validators['MaintainableArtefact']['contact']
 
     def save(self, *args, **kwargs):
         if not kwargs.get('registration'):
             created = not bool(self.pk)
             action = 'Append' if created else 'Replace'
-            from ..utils.permissions import get_current_user
-            created_by = get_current_user().contact
-            print(created_by)
-            print(type(created_by))
-            registration = MetaStructure(created_by=created_by, action=action, interactive=True)
+            created_by = get_current_user()
+            registration = Registration(created_by=created_by, action=action, interactive=True)
             registration.save()
             kwargs['registration'] = registration 
-            print(kwargs['registration'])
         self.full_clean()
         registration = kwargs.pop('registration')
         super().save(*args, **kwargs)
         self.registrations.add(registration)
 
     def delete(self):
+        #improve this by creating a delete flag on maintaintable artefacts and only allow administrators of the maintainable agency, as well as super users to perform this action
+        #the code below makes a delete registration but removes completely the artefact so no historicity is kept
         action = 'Delete'
-        from ..utils.permissions import get_current_user
-        created_by = get_current_user().contact
-        MetaStructure(created_by=created_by, action=action).save()
+        created_by = get_current_user()
+        Registration(created_by=created_by, action=action, interactive=True).save()
         super().delete()
 
 # class Item(NameableArtefact):

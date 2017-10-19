@@ -30,10 +30,16 @@ re_validators = {
 }
 
 clean_validators = {
-    'MaintainableArtefact': ValidationError(
-        _('Final structures cannot be updated'),
-        'isfinal'
-    ),
+    'MaintainableArtefact': {
+        'update' : ValidationError(
+            _('Final structures cannot be updated'),
+            'isfinal',
+        ),
+        'contact': ValidationError(
+            _('A user that is not a contact cannot modify structures'),
+            'notcontact'
+        )
+    },
     'Obs': ValidationError(
         _('Obs instances cannot be modified.  Create a new instance and select the appropriate action'),
         'exists'

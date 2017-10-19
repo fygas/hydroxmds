@@ -4,8 +4,9 @@ from django.contrib import admin
 from ..models.organisation import OrganisationScheme, Organisation 
 from ..models.codelist import Code, Codelist 
 from ..models.conceptscheme import Concept, ConceptScheme
-from ..models.data_structly import DataStructure, Dataflow
+from ..models.data_structly import DataStructure, Dataflow, Group
 from ..models.provision import DataProvisionAgreement
+from ..models.constraint import AttachmentConstraint, ContentConstraint
 
 #Importing admin objects
 from .organisation import OrganisationSchemeAdmin, OrganisationAdmin
@@ -13,6 +14,7 @@ from .codelist import CodelistAdmin, CodeAdmin
 from .conceptscheme import ConceptAdmin, ConceptSchemeAdmin
 from .data_structly import DataStructureAdmin, DataflowAdmin
 from .provision import DataProvisionAgreementAdmin
+from .constraint import AttachmentConstraintAdmin, ContentConstraintAdmin
 
 admin.site.register(OrganisationScheme, OrganisationSchemeAdmin)
 admin.site.register(Organisation, OrganisationAdmin)
@@ -20,9 +22,12 @@ admin.site.register(Code, CodeAdmin)
 admin.site.register(Codelist, CodelistAdmin)
 admin.site.register(ConceptScheme, ConceptSchemeAdmin)
 admin.site.register(Concept, ConceptAdmin)
+admin.site.register(Group, admin.ModelAdmin)
 admin.site.register(DataStructure, DataStructureAdmin)
 admin.site.register(Dataflow, DataflowAdmin)
 admin.site.register(DataProvisionAgreement, DataProvisionAgreementAdmin)
+admin.site.register(AttachmentConstraint, AttachmentConstraintAdmin)
+admin.site.register(ContentConstraint, ContentConstraintAdmin)
 
 # from .base import (
 #     NameableArtefactAdmin, MaintainableArtefactAdmin, ItemAdmin,

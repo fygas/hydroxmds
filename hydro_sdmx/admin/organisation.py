@@ -22,6 +22,7 @@ class EmailNestedTabularInline(NestedTabularInline):
 
 class ContactNestedStackedInline(NestedStackedInline):
     model = Contact
+    classes = ('collapse', )
     inlines = [
         TelephoneNestedTabularInline, EmailNestedTabularInline, FaxNestedTabularInline, X400NestedTabularInline, URINestedTabularInline, AnnotationNestedStackedInline
     ]

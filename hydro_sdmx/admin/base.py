@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .annotation import AnnotationInline
+from .annotation import AnnotationStackedInline
 
 class IdentifiableArtefactAdmin(admin.ModelAdmin):
     search_fields = ['id_code']
@@ -14,7 +14,7 @@ class IdentifiableArtefactAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
     ] 
-    inlines = [AnnotationInline,]
+    inlines = [AnnotationStackedInline,]
 
 class NameableArtefactAdmin(IdentifiableArtefactAdmin):
     fieldsets = [ 
@@ -62,6 +62,7 @@ class VersionableArtefactAdmin(NameableArtefactAdmin):
         return search_fields
 
 class MaintainableArtefactAdmin(VersionableArtefactAdmin):
+    raw_id_fields = ('agency',)
     fieldsets = [ 
         (None, {
             'fields': (
@@ -74,7 +75,7 @@ class MaintainableArtefactAdmin(VersionableArtefactAdmin):
                 ('valid_from', 'valid_to'), 
                 ('description', 'uri',),
             ),
-            'classes': ('collapse',)
+            'classes': ('collapse',),
         }),
     ] 
     list_filter = ['version', 'agency']

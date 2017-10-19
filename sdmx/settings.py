@@ -161,22 +161,11 @@ ADMIN_REORDER = (
     {'app': 'hydro_sdmx', 'label': 'Organisation related models',
      'models': (
          'hydro_sdmx.Organisation', 
-         'hydro_sdmx.Contact', 
-         'hydro_sdmx.AgencyScheme', 
-         'hydro_sdmx.DataConsumerScheme',
-         'hydro_sdmx.DataProviderScheme',
-         'hydro_sdmx.OrganisationUnitScheme',
-     )
-    },
-    {'app': 'hydro_sdmx', 'label': 'Annotation model',
-     'models': (
-         'hydro_sdmx.Annotation', 
+         'hydro_sdmx.OrganisationScheme',
      )
     },
     {'app': 'hydro_sdmx', 'label': 'Code and representation related models',
      'models': (
-         'hydro_sdmx.TextFormatInfo', 
-         'hydro_sdmx.Representation', 
          'hydro_sdmx.Code', 
          'hydro_sdmx.Codelist', 
      )
@@ -192,6 +181,12 @@ ADMIN_REORDER = (
          'hydro_sdmx.DataStructure', 
          'hydro_sdmx.Dataflow', 
          'hydro_sdmx.DataProvisionAgreement', 
+     )
+    },
+    {'app': 'hydro_sdmx', 'label': 'Constraints',
+     'models': (
+         'hydro_sdmx.AttachmentConstraint', 
+         'hydro_sdmx.ContentConstraint', 
      )
     },
 )
