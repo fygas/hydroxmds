@@ -97,7 +97,7 @@ METADATA_TARGET_TYPES = (
     ('IdentifiableObjectTarget', 'IdentifiableObjectTarget'),
 )
 
-DATA_TYPES = {
+DATA_TYPES = ( 
     (None, 'None'),
     ('String', 'String'),
     ('Alpha', 'Alpha'),
@@ -143,7 +143,8 @@ DATA_TYPES = {
     ('IdentifiableReference', 'IdentifiableReference'),
     ('DataSetReference', 'DataSetReference'),
     ('AttachmentConstraintReference', 'AttachmentConstraintReference'),
-}
+)
+
 
 CLASS_TYPES = (
     (None, 'None'),
@@ -251,7 +252,7 @@ TOKENS = (
 )
 
 ACTIONS = (
-    ('Append', 'Append'),
-    ('Replace', 'Replace'),
-    ('Delete', 'Delete'),
+    ('A', 'Append'),
+    ('R', 'Replace'),
+    ('D', 'Delete'),
 )

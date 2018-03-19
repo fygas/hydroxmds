@@ -3,9 +3,9 @@ from django.db import models
 from .abstract import MaintainableArtefact 
 from .codelist import Code
 from .data_structly import Dataflow, DataStructure 
-from .provision import DataProvisionAgreement
+from .provision import ProvisionAgreement
 from .organisation import Organisation
-from .registration import Source 
+from .registration import Registration 
 
 from ..managers.constraint import (
     ConstraintDataKeyManager, KeyValueManager, ContentConstraintManager, 
@@ -14,8 +14,6 @@ from ..managers.constraint import (
 from ..settings import api_maxlen_settings as maxlengths 
 
 class Constraint(MaintainableArtefact):
-    datasets = models.ManyToManyField(Dataflow, related_name='dataset_attachment_constraints')
-    datasources = models.ManyToManyField(Source, blank=True, related_name='attachment_constraints')
 
     class Meta(MaintainableArtefact.Meta):
         abstract = True
@@ -26,35 +24,26 @@ class Constraint(MaintainableArtefact):
     def provision_set(self):
         return self.attached2ids('provisions')
 
-class AttachmentConstraint(Constraint):
+class AttachmentConstraint(MaintainableArtefact):
     #intuition of AttachmentConstraint as far as I understand...
     #Attachment constraints allows someone to present the same data differently, ie more compact or less compact, by generating partial data keysets for which their attribute values remain unchanged.
     #AttachmentConstraints can be attached on the dataset level, the dataflow level, the datastructure level, the provisional agreement level and the datasource level.
     #Thus attachment constraints attached to related structures can be more or less restrictive based on the type of attachment level, with the less restrictive to be for the dataset level and the most restrictive to the datasource level
-    data_structures = models.ManyToManyField(DataStructure, related_name='attachemt_constraints', blank=True)
-    dataflows = models.ManyToManyField(Dataflow, related_name='dataflow_attachment_constraints', blank=True)
-    provisions = models.ManyToManyField(DataProvisionAgreement, blank=True, related_name='attachment_constraints')
+    datasets = models.ManyToManyField(Dataflow, blank=True, related_name='dataset_attachmentconstraint_set')
+    datasources = models.ManyToManyField(Registration, blank=True, related_name='datasource_attachmentconstraint_set')
+    data_structures = models.ManyToManyField(DataStructure, blank=True)
+    dataflows = models.ManyToManyField(Dataflow, blank=True)
+    provisions = models.ManyToManyField(ProvisionAgreement, blank=True)
 
     objects = AttachmentConstraintManager()
 
-    def data_structure_set(self):
-        return self.attached2ids('data_structures')
-    def dataflow_set(self):
-        return self.attached2ids('dataflows')
-    def datasource_set(self):
-        return self.attached2ids('datasources')
-    def dataset_set(self):
-        return self.attached2ids('datasets')
-
 class ContentConstraint(Constraint):
-    provisions = models.ManyToManyField(DataProvisionAgreement, blank=True, related_name='content_constraints')
-    dataproviders = models.ManyToManyField(Organisation, related_name='content_constraints', blank=True)
-    data_structures = models.ManyToManyField(DataStructure, related_name='content_constraints', blank=True)
-    dataflows = models.ManyToManyField(Dataflow, related_name='dataflow_content_constraints', blank=True)
-    datasets = None 
-    dataset = models.ForeignKey(Dataflow, null=True, blank=True, on_delete=models.CASCADE, related_name='dataset_content_constraints') 
-    datasources = None
-    datasource = models.ForeignKey(Source, null=True, blank=True, on_delete=models.CASCADE, related_name='content_constraints') 
+    provisions = models.ManyToManyField(ProvisionAgreement, blank=True)
+    data_provider = models.ForeignKey(Organisation, blank=True, null=True, on_delete=models.CASCADE, related_name='data_provider_contentconstraint_set')
+    data_structures = models.ManyToManyField(DataStructure, blank=True)
+    dataflows = models.ManyToManyField(Dataflow, blank=True)
+    dataset = models.ForeignKey(Dataflow, null=True, blank=True, on_delete=models.CASCADE, related_name='dataset_contentconstraint_set') 
+    datasource = models.ForeignKey(Registration, null=True, blank=True, on_delete=models.CASCADE, related_name='content_constraints') 
     periodicity = models.CharField(max_length=maxlengths.PERIODICITY, blank=True)
     offset = models.CharField(max_length=maxlengths.OFFSET, blank=True)
     tolerance = models.CharField(max_length=maxlengths.TOLERANCE, blank=True)
@@ -79,7 +68,7 @@ class Key(models.Model):
     objects = ConstraintDataKeyManager()
 
     def key(self):
-        return ', '.join('%s: %s' % pair.get_value() for pair in self.key_values)  
+        return ', '.join('%s:%s' % pair.get_value() for pair in self.key_values)  
 
     def __str__(self):
         return self.data_key()
@@ -105,7 +94,7 @@ class KeyValue(models.Model):
 
 class CubeRegion(models.Model):
     content_constraint = models.ForeignKey(ContentConstraint, on_delete=models.CASCADE, related_name='cube_regions')
-    include = models.BooleanField(default=True)
+    is_included = models.BooleanField(default=True)
 
     def region(self):
         return ', '.join('%s: (%s)' % (key_value_set[0][0], ', '.join(key_value_set[1])) for key_value_set in self.key_value_sets) 

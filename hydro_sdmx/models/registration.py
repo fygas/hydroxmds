@@ -1,3 +1,4 @@
+import uuid
 
 from django.db import models
 from django.utils.translation import ugettext as _
@@ -9,26 +10,21 @@ from ..settings import api_maxlen_settings as maxlengths
 from ..constants import ACTIONS 
 
 def sdmx_upload_path(instance, filename):
-    return 'sdmx_uploads/user_{0}_{1}'.format(instance.user.id, filename)
+    return 'sdmx_uploads/user_{0}_{1}_{2}'.format(instance.user.id, uuid.uuid4(), filename)
 
-class Source(models.Model):
-    from_file = models.FileField(upload_to = sdmx_upload_path, blank=True, null=True)
-    from_url = models.URLField(blank=True, null=True, unique=True)
-    url_file = models.FileField(upload_to = sdmx_upload_path, blank=True, null=True)
-
-class Registration(MP_Node):
-    created_by = models.ForeignKey(
-        User, verbose_name=_("created by"), null=True, editable=False, related_name='+' 
-    )
+class Registration(MP_Node, models.Model):
     creation_date = models.DateTimeField(auto_now_add=True)
-    action = models.CharField(max_length=maxlengths.ID_CODE, choices=ACTIONS)
-    interactive = models.BooleanField(default=False)
-    set_id = models.CharField(max_length=maxlengths.ID_CODE, null=True)
+    action = models.CharField(max_length=maxlengths.ID_CODE, choices=ACTIONS, default='A')
+    interactive = models.BooleanField(default=False, editable=False)
     parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE)
-    source = models.ForeignKey(Source, null=True, blank=True, on_delete=models.CASCADE)
+    sdmx_file = models.FileField(upload_to = sdmx_upload_path, blank=True, null=True)
+    sdmx_location = models.URLField(blank=True, null=True)
+    registrant = models.ForeignKey(
+        User, verbose_name=_("registrant"), null=True, editable=False, related_name='+' 
+    )
 
     def __str__(self):
-        return '%s:%s:%s' % (self.created_by, self.action, self.interactive)
+        return '%s:%s:%s' % (self.registrant.username, self.action, self.interactive)
 
     def save(self, **kwargs):
         if not self.depth:

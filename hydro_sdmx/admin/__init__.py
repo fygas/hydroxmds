@@ -1,21 +1,26 @@
 from django.contrib import admin
 
 #Importing model objects
+from ..models.registration import Registration
 from ..models.organisation import OrganisationScheme, Organisation 
 from ..models.codelist import Code, Codelist 
 from ..models.conceptscheme import Concept, ConceptScheme
 from ..models.data_structly import DataStructure, Dataflow, Group
-from ..models.provision import DataProvisionAgreement
-from ..models.constraint import AttachmentConstraint, ContentConstraint
+from ..models.provision import ProvisionAgreement
+from ..models.constraint import AttachmentConstraint, ContentConstraint, Key
+from ..models.data import DatasetAttribute, DimensionLevelAttribute, Observation, ObservationAttribute, Time
 
 #Importing admin objects
+from .registration import RegistrationAdmin
 from .organisation import OrganisationSchemeAdmin, OrganisationAdmin
 from .codelist import CodelistAdmin, CodeAdmin 
 from .conceptscheme import ConceptAdmin, ConceptSchemeAdmin
 from .data_structly import DataStructureAdmin, DataflowAdmin
-from .provision import DataProvisionAgreementAdmin
-from .constraint import AttachmentConstraintAdmin, ContentConstraintAdmin
+from .provision import ProvisionAgreementAdmin
+from .constraint import AttachmentConstraintAdmin, ContentConstraintAdmin, KeyAdmin
+from .data import DatasetAttributeAdmin, DimensionLevelAttributeAdmin, ObservationAdmin, ObservationAttributeAdmin, TimeAdmin
 
+admin.site.register(Registration, RegistrationAdmin)
 admin.site.register(OrganisationScheme, OrganisationSchemeAdmin)
 admin.site.register(Organisation, OrganisationAdmin)
 admin.site.register(Code, CodeAdmin)
@@ -25,9 +30,15 @@ admin.site.register(Concept, ConceptAdmin)
 admin.site.register(Group, admin.ModelAdmin)
 admin.site.register(DataStructure, DataStructureAdmin)
 admin.site.register(Dataflow, DataflowAdmin)
-admin.site.register(DataProvisionAgreement, DataProvisionAgreementAdmin)
+admin.site.register(ProvisionAgreement, ProvisionAgreementAdmin)
 admin.site.register(AttachmentConstraint, AttachmentConstraintAdmin)
 admin.site.register(ContentConstraint, ContentConstraintAdmin)
+admin.site.register(DatasetAttribute, DatasetAttributeAdmin)
+admin.site.register(DimensionLevelAttribute, DimensionLevelAttributeAdmin)
+admin.site.register(Observation, ObservationAdmin)
+admin.site.register(ObservationAttribute, ObservationAttributeAdmin)
+admin.site.register(Key, KeyAdmin)
+admin.site.register(Time, TimeAdmin)
 
 # from .base import (
 #     NameableArtefactAdmin, MaintainableArtefactAdmin, ItemAdmin,

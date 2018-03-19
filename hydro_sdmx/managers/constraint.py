@@ -18,7 +18,7 @@ class DataKeySetManager(models.Manager):
 class ConstraintDataKeyManager(models.Manager):
     def get_queryset(self):
         super_qs = super().get_queryset()
-        return super_qs.select_related('data_key_set').prefetch_related('key_values')
+        return super_qs.select_related('constraint_key_set').prefetch_related('key_values')
 
 class KeyValueManager(models.Manager):
     def get_queryset(self):

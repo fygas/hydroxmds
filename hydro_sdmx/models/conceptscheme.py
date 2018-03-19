@@ -16,5 +16,5 @@ class Concept(RepresentedItemWithParent):
         'id', max_length=api_maxlen_settings.ID_CODE,
         validators=[re_validators['IDType']],
     )
-    wrapper = models.ForeignKey(ConceptScheme, verbose_name='Concept Scheme', on_delete=models.CASCADE, related_name='concepts')
+    wrapper = models.ForeignKey(ConceptScheme, verbose_name='Concept Scheme', on_delete=models.CASCADE)
     iso_concept_reference = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='+')

@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     #### THIRD PARTY APPLICATIONS ####
-    #'rest_framework',
+    'rest_framework',
     #'drf_multiple_model',
     'nested_admin',
     'admin_reorder',
@@ -158,6 +158,11 @@ REST_FRAMEWORK = {
 }
 ADMIN_REORDER = (
     'auth',
+    {'app': 'hydro_sdmx', 'label': 'Registration',
+     'models': (
+         'hydro_sdmx.Registration', 
+     )
+    },
     {'app': 'hydro_sdmx', 'label': 'Organisation related models',
      'models': (
          'hydro_sdmx.Organisation', 
@@ -187,6 +192,14 @@ ADMIN_REORDER = (
      'models': (
          'hydro_sdmx.AttachmentConstraint', 
          'hydro_sdmx.ContentConstraint', 
+     )
+    },
+    {'app': 'hydro_sdmx', 'label': 'Datasets',
+     'models': (
+         'hydro_sdmx.DatasetAttribute', 
+         'hydro_sdmx.DimensionLevelAttribute', 
+         'hydro_sdmx.Observation', 
+         'hydro_sdmx.ObservationAttribute', 
      )
     },
 )

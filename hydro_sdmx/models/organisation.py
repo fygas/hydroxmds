@@ -1,23 +1,24 @@
-from django.contrib.auth.models import User 
+from django.contrib.auth.models import User
 from django.db import models
 
 from treebeard.mp_tree import MP_Node
 
-from .abstract import NameableArtefact, MaintainableArtefact
-from ..settings import api_maxlen_settings as maxlengths 
+from ..settings import api_maxlen_settings as maxlengths
+from .abstract import MaintainableArtefact, IdentifiableArtefact 
+
 
 class OrganisationScheme(MaintainableArtefact):
     pass
 
-class Organisation(NameableArtefact, MP_Node):
+class Organisation(IdentifiableArtefact, MP_Node):
     schemes = models.ManyToManyField(OrganisationScheme, blank=True)
     parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE)
 
-    class Meta(NameableArtefact.Meta):
+    class Meta(IdentifiableArtefact.Meta):
         unique_together = ('id_code',)
 
     def __str__(self):
-        return '%s:%s' % (self.id_code, self.name)
+        return self.id_code 
 
     def save(self, **kwargs):
         if not self.depth:
@@ -26,6 +27,7 @@ class Organisation(NameableArtefact, MP_Node):
                 self.parent.add_child(instance=self)
             else:
                 self.add_root(instance=self)
+
             return  #add_root and add_child save as well
         super().save(**kwargs)
 
@@ -33,10 +35,9 @@ class Contact(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='contact')
     organisation = models.ForeignKey(Organisation, on_delete=models.CASCADE)
     department = models.CharField(max_length=maxlengths.DEPARTMENT, blank=True)
-    role = models.CharField(max_length=maxlengths.ROLE, blank=True)
 
     class Meta:
-        indexes = [ 
+        indexes = [
             models.Index(fields=['user']),
             models.Index(fields=['organisation']),
             models.Index(fields=['user', 'organisation']),

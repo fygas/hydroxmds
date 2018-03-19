@@ -14,4 +14,4 @@ class Codelist(MaintainableArtefact):
     )
 
 class Code(ItemWithParent):
-    wrapper = models.ForeignKey(Codelist, verbose_name='Codelist', on_delete=models.CASCADE, related_name='codes')
+    wrapper = models.ForeignKey(Codelist, verbose_name='Codelist', on_delete=models.CASCADE)

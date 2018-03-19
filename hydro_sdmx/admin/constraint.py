@@ -1,4 +1,6 @@
+from django.contrib import admin
 from nested_admin import NestedTabularInline, NestedModelAdmin, NestedStackedInline
+from .common import NameNestedTabularInline, DescriptionNestedTabularInline
 
 from ..models.constraint import KeyValue, Key, ConstraintKeySet, CodeValueDetail, KeyValueSet, CubeRegion
 from .annotation import AnnotationNestedStackedInline
@@ -15,18 +17,26 @@ class KeyNestedTabularInline(NestedTabularInline):
     classes = ['collapse']
     inlines = [KeyValueNestedTabularInline]
 
-class ConstraintKeySetNestedTabularInline(NestedTabularInline):
+class AttachmentConstraintKeySetNestedTabularInline(NestedTabularInline):
     model = ConstraintKeySet
     classes = ['collapse']
     inlines = [KeyNestedTabularInline]
+    exclude = ('content_constraint',)
 
-class AttachmentConstraintAdmin(MaintainableArtefactAdmin, NestedModelAdmin):
+class AttachmentConstraintAdmin(MaintainableArtefactAdmin):
     fieldsets = [ 
-        (None, {
+        ('Identification', {
             'fields': (
-                ('id_code', 'name',),
-                ('agency', 'version',),
-            )
+                ('id_code', 'agency', 'version'),
+                'uri',
+            ),
+            'classes': ('collapse',)
+        }),
+        ('Duration', {
+            'fields': (
+                ('valid_from', 'valid_to'), 
+            ),
+            'classes': ('collapse',)
         }),
         ('Attachments', {
             'fields': (
@@ -38,16 +48,9 @@ class AttachmentConstraintAdmin(MaintainableArtefactAdmin, NestedModelAdmin):
             ),
             'classes': ('collapse',),
         }),
-        ('Additional information', {
-            'fields': (
-                ('valid_from', 'valid_to'), 
-                ('description', 'uri',),
-            ),
-            'classes': ('collapse',),
-        }),
     ] 
     list_filter = ['version', 'agency', 'dataflows', 'data_structures']
-    inlines = [ConstraintKeySetNestedTabularInline, AnnotationNestedStackedInline]
+    inlines = [NameNestedTabularInline, DescriptionNestedTabularInline, AnnotationNestedStackedInline, AttachmentConstraintKeySetNestedTabularInline]
 
 class CodeValueDetailNestedTabularInline(NestedTabularInline):
     model = CodeValueDetail
@@ -76,16 +79,29 @@ class KeyValueSetNestedStackedInline(NestedStackedInline):
 
 class CubeRegionNestedTabularInline(NestedTabularInline):
     model = CubeRegion 
-    fields = ('include',)
+    fields = ('is_included',)
     inlines = [KeyValueSetNestedStackedInline]
+
+class ContentConstraintKeySetNestedTabularInline(NestedTabularInline):
+    model = ConstraintKeySet
+    classes = ['collapse']
+    inlines = [KeyNestedTabularInline]
+    exclude = ('attachment_constraint',)
 
 class ContentConstraintAdmin(MaintainableArtefactAdmin, NestedModelAdmin):
     fieldsets = [ 
-        (None, {
+        ('Identification', {
             'fields': (
-                ('id_code', 'name',),
-                ('agency', 'version',),
-            )
+                ('id_code', 'agency', 'version'),
+                'uri',
+            ),
+            'classes': ('collapse',)
+        }),
+        ('Duration', {
+            'fields': (
+                ('valid_from', 'valid_to'), 
+            ),
+            'classes': ('collapse',)
         }),
         ('Attachments', {
             'fields': (
@@ -99,22 +115,23 @@ class ContentConstraintAdmin(MaintainableArtefactAdmin, NestedModelAdmin):
         }),
         ('Data provider attachments', {
             'fields': (
-                'dataproviders',
+                'dataprovider',
                 ('periodicity', 'offset', 'tolerance'),
                 ('start_time', 'end_time'),
             ),
             'classes': ('collapse',),
         }),
-        ('Additional information', {
-            'fields': (
-                ('valid_from', 'valid_to'), 
-                ('description', 'uri',),
-            ),
-            'classes': ('collapse',),
-        }),
     ] 
     list_filter = ['version', 'agency', 'dataflows', 'data_structures']
-    inlines = [ConstraintKeySetNestedTabularInline, CubeRegionNestedTabularInline, AnnotationNestedStackedInline]
+    inlines = [NameNestedTabularInline, DescriptionNestedTabularInline, AnnotationNestedStackedInline, ContentConstraintKeySetNestedTabularInline, CubeRegionNestedTabularInline]
+
+class KeyValueTabularInline(admin.TabularInline):
+    model = KeyValue
+    classes = ['collapse']
+    fields = ('component_id', 'code_value', 'string_value')
+
+class KeyAdmin(admin.ModelAdmin):
+    inlines = [KeyValueTabularInline]
 
 # from django.contrib import admin
 #

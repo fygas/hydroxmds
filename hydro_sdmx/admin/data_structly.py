@@ -1,12 +1,14 @@
-from nested_admin import NestedModelAdmin
+from nested_admin import NestedStackedInline
 from ..models.data_structly import Dimension, Attribute, Group 
 from .annotation import AnnotationNestedStackedInline
 from .base import MaintainableArtefactAdmin 
 from .base_nested_inline import RepresentedItemNestedStackedInline
+from .common import NameNestedTabularInline, DescriptionNestedTabularInline
 
 class DimensionNestedStackedInline(RepresentedItemNestedStackedInline):
+    inlines = [AnnotationNestedStackedInline]
     model = Dimension
-    filter_horizontal = ('groups', 'roles',)
+    filter_horizontal = ('roles',)
     fieldsets = [ 
         (None, {
             'fields': (
@@ -28,7 +30,7 @@ class DimensionNestedStackedInline(RepresentedItemNestedStackedInline):
                 ('min_value', 'max_value'),
                 'decimals',
                 'pattern',
-                'is_multiLingual'),
+                'is_multi_lingual'),
             'classes': ('collapse',)
         }),
         ('Measure Representation', {
@@ -41,7 +43,6 @@ class DimensionNestedStackedInline(RepresentedItemNestedStackedInline):
             'fields': (
                 ('is_concept_role', 'uri'),
                 'roles',
-                'groups',
             ),
             'classes': ('collapse',)
         }),
@@ -49,8 +50,9 @@ class DimensionNestedStackedInline(RepresentedItemNestedStackedInline):
     inlines = (AnnotationNestedStackedInline,)
 
 class AttributeNestedStackedInline(RepresentedItemNestedStackedInline):
+    inlines = [AnnotationNestedStackedInline]
     model = Attribute 
-    filter_horizontal = ('roles', 'attached2dims', 'attached2groups')
+    filter_horizontal = ('roles', 'attached2dimensions')
     fieldsets = [ 
         (None, {
             'fields': (
@@ -71,7 +73,7 @@ class AttributeNestedStackedInline(RepresentedItemNestedStackedInline):
                 ('min_value', 'max_value'),
                 'decimals',
                 'pattern',
-                'is_multiLingual'),
+                'is_multi_lingual'),
             'classes': ('collapse',)
         }),
         ('Additional information', {
@@ -82,19 +84,19 @@ class AttributeNestedStackedInline(RepresentedItemNestedStackedInline):
         }),
         ('Attachments', {
             'fields': (
-                'attached2dims',
-                'attached2measure',
-                'attached2dim_in_group',
-                'attached2groups'
+                'attached2dataset',
+                'attached2group',
+                'attached2dimensions',
+                'attached2measure'
             ),
             'classes': ('collapse',)
         }),
     ] 
 
-class GroupNestedStackedInline(NestedModelAdmin):
+class GroupNestedStackedInline(NestedStackedInline):
     model = Group
     inlines = (AnnotationNestedStackedInline,)
-    classes = ('wrapper')
+    classes = ('collapse',)
     fieldsets = [ 
         (None, {
             'fields': (
@@ -105,21 +107,21 @@ class GroupNestedStackedInline(NestedModelAdmin):
         }),
     ]
 
-class DataStructureAdmin(MaintainableArtefactAdmin, NestedModelAdmin):
-    inlines = [DimensionNestedStackedInline, GroupNestedStackedInline, AttributeNestedStackedInline, AnnotationNestedStackedInline]
+class DataStructureAdmin(MaintainableArtefactAdmin):
+    inlines = [NameNestedTabularInline, DescriptionNestedTabularInline, DimensionNestedStackedInline, GroupNestedStackedInline, AttributeNestedStackedInline, AnnotationNestedStackedInline]
     fieldsets = [ 
-        (None, {
+        ('Identification', {
             'fields': (
-                ('id_code', 'name',),
-                ('agency', 'version',),
-            )
+                ('id_code', 'agency', 'version'),
+                'uri',
+            ),
+            'classes': ('collapse',)
         }),
-        ('Additional information', {
+        ('Duration', {
             'fields': (
                 ('valid_from', 'valid_to'), 
-                ('description', 'uri',),
             ),
-            'classes': ('collapse',),
+            'classes': ('collapse',)
         }),
         ('Observation', {
             'fields': (
@@ -131,18 +133,26 @@ class DataStructureAdmin(MaintainableArtefactAdmin, NestedModelAdmin):
                 ('min_value', 'max_value'),
                 'decimals',
                 'pattern',
-                'is_multiLingual'),
+                'is_multi_lingual'),
             'classes': ('collapse',)
         }),
     ] 
     list_filter = ['version', 'agency']
 
 class DataflowAdmin(MaintainableArtefactAdmin):
-    def get_fieldsets(self, request, obj=None):
-        fieldsets = super().get_fieldsets(request, obj)
-        fieldsets[0][1]['fields'] = (
-            ('id_code', 'name'), 
-            ('agency', 'version'),
-            'structure',
-        ) 
-        return fieldsets 
+    fieldsets = [ 
+        ('Identification', {
+            'fields': (
+                ('id_code', 'agency', 'version'),
+                'structure',
+                'uri',
+            ),
+            'classes': ('collapse',)
+        }),
+        ('Duration', {
+            'fields': (
+                ('valid_from', 'valid_to'), 
+            ),
+            'classes': ('collapse',)
+        }),
+    ] 

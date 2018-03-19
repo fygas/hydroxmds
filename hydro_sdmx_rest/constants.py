@@ -1,16 +1,17 @@
 METARESOURCES = ['datastructure', 'dataflow', 'codelist', 'conceptscheme', 'process']
+
 FIELDS = {
-    'TRACKING': ('class_name', 'id', 'created_by', 'changed_by', 'creation_date', 'changed_date'),
-    'ANNOTATION': ('annotation_title', 'annotation_URL', 'annotation_text', 'id_code'),
+    'Klass': ('Klass',) 
 }
-FIELDS['ANNOTABLE'] = FIELDS['TRACKING'] + ('annotations',)
-FIELDS['IDENTIFIABLE'] = FIELDS['ANNOTABLE'] + ('id_code', 'uri')
-FIELDS['STRUCTURE_ITEM'] = FIELDS['IDENTIFIABLE'] + ('wrapper', 'concept')
+FIELDS['ANNOTATION'] = FIELDS['Klass'] + ('id_code', 'annotation_title', 'annotation_type', 'annotation_URL', 'annotation_text')
+FIELDS['IDENTIFIABLE'] = FIELDS['Klass'] + ('id_code', 'uri', 'annotations')
 FIELDS['NAMEABLE'] = FIELDS['IDENTIFIABLE'] + ('name', 'description')
+FIELDS['VERSIONABLE'] = FIELDS['NAMEABLE'] + ('version', 'valid_from', 'valid_to')
 FIELDS['ITEM'] = FIELDS['IDENTIFIABLE'] + ('wrapper',)
 FIELDS['ITEMWITHPARENT'] = FIELDS['IDENTIFIABLE'] + ('wrapper', 'parent', 'depth')
 FIELDS['VERSIONABLE'] = FIELDS['NAMEABLE'] + ('version', 'valid_from', 'valid_to')
-FIELDS['MAINTAINABLE'] = FIELDS['VERSIONABLE'] + ('is_final', 'agency')
+FIELDS['MAINTAINABLE'] = FIELDS['VERSIONABLE'] + ('is_final', 'agency', 'registration')
+
 FIELDS['TEXTFORMAT'] = FIELDS['TRACKING'] + ('id_code', 'text_type', 'is_sequence', 'interval', 'start_value', 'end_value', 'time_interval', 'start_time', 'end_time', 'min_length', 'max_length', 'min_value', 'max_value', 'decimals', 'pattern', 'is_multiLingual') 
 FIELDS['REPRESENTATION'] = FIELDS['TRACKING'] + ('text_format', 'enumeration', 'enumeration_format') 
 FIELDS['CATEGORIZATION'] = FIELDS['MAINTAINABLE'] + ['source', 'target']
@@ -41,7 +42,3 @@ FIELDS['ATTRVALUEACTION'] = FIELDS['TRACKING'] + ('attr_value', 'dataflow', 'dat
 FIELDS['OBS'] = FIELDS['TRACKING'] + ('data_key', 'value', 'action')
 FIELDS['METADATATARGETKEY'] = FIELDS['TRACKING'] + ('metadata_flow', 'target', 'report', 'metadata_target', 'attached_attrs')
 FIELDS['METAKEYVALUE'] = FIELDS['TRACKING'] + ('metadata_target_key', 'component', 'object_value', 'data_key_value', 'data_set_value', 'constraint_value', 'report_period_value')
-
-
-
-

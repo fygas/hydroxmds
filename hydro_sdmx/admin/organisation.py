@@ -1,9 +1,9 @@
-from nested_admin import NestedTabularInline, NestedStackedInline, NestedModelAdmin
+from nested_admin import NestedTabularInline, NestedStackedInline 
 
 from .annotation import AnnotationNestedStackedInline
 from .base import NameableArtefactAdmin, MaintainableArtefactAdmin
+from .common import NameNestedTabularInline, DescriptionNestedTabularInline
 from ..models import Telephone, Fax, X400, Email, URI, Contact
-
 
 class TelephoneNestedTabularInline(NestedTabularInline):
     model = Telephone
@@ -20,33 +20,43 @@ class URINestedTabularInline(NestedTabularInline):
 class EmailNestedTabularInline(NestedTabularInline):
     model = Email 
 
+class DepartmentNestedTabularInline(NameNestedTabularInline):
+    fk_name = 'contact_department'
+    verbose_name_plural = 'Departments'
+
+class RoleNestedTabularInline(NameNestedTabularInline):
+    fk_name = 'contact_role'
+    verbose_name_plural = 'Roles'
+    
+class ContactNameNestedTabularInline(NameNestedTabularInline):
+    fk_name = 'contact_name'
+    verbose_name_plural = 'Names'
+
 class ContactNestedStackedInline(NestedStackedInline):
     model = Contact
     classes = ('collapse', )
     inlines = [
-        TelephoneNestedTabularInline, EmailNestedTabularInline, FaxNestedTabularInline, X400NestedTabularInline, URINestedTabularInline, AnnotationNestedStackedInline
+        ContactNameNestedTabularInline, DepartmentNestedTabularInline,
+        RoleNestedTabularInline, TelephoneNestedTabularInline,
+        EmailNestedTabularInline, FaxNestedTabularInline,
+        X400NestedTabularInline, URINestedTabularInline,
+        AnnotationNestedStackedInline
     ]
     fieldsets = (
         (None, {
-            'fields': (('user', 'organisation',),
-                       ('department', 'role')),
+            'fields': (('user', 'organisation',)),
         }),
     )
 
-class OrganisationAdmin(NestedModelAdmin, NameableArtefactAdmin):
-    inlines = [ContactNestedStackedInline, AnnotationNestedStackedInline]
+class OrganisationAdmin(NameableArtefactAdmin):
+    inlines = [NameNestedTabularInline, DescriptionNestedTabularInline, AnnotationNestedStackedInline, ContactNestedStackedInline]
     filter_horizontal = ('schemes',)
     fieldsets = [ 
-        (None, {
+        ('Identification', {
             'fields': (
-                ('id_code', 'name',),
-                'schemes',
-            )
-        }),
-        ('Additional information', {
-            'fields': (
+                ('id_code', 'uri',),
                 'parent',
-                ('description', 'uri',),
+                'schemes',
             ),
             'classes': ('collapse',)
         }),

@@ -13,12 +13,17 @@ This module provides the `api_setting` object, that is used to access
 HYDRO_SDMX settings, checking for user settings first, then falling
 back to the defaults.
 """
+import os.path
 
 from django.conf import settings
 from django.test.signals import setting_changed
 
+MODULE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 DEFAULTS = {
-    'HYDRO_SDMX': {},
+    'HYDRO_SDMX': {
+        'SDMXMLSCHEMA': os.path.join(MODULE_DIR, 'schemas', 'xml', 'SDMXMessage.xsd')
+    },
     'HYDRO_SDMX_MAXLENGTHS': {
         'ID_CODE': 63,
         'NAME': 255,
@@ -40,7 +45,8 @@ DEFAULTS = {
         'VALUE_MAP': 127,
         'PERIODICITY': 63,
         'OFFSET': 63,
-        'TOLERANCE': 63
+        'TOLERANCE': 63,
+        'LANG': 63
     }
 }
 
